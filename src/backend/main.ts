@@ -15,7 +15,7 @@ import {app} from "electron";
 
 // Setup logging immediately to pick up any logging during IModelHost.startup()
 Logger.initializeToConsole();
-Logger.setLevelDefault(LogLevel.Info);
+Logger.setLevelDefault(LogLevel.Warning);
 Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
 /**

@@ -29,7 +29,7 @@ export interface AppState {
     isLoading?: boolean;
   };
   imodel?: IModelConnection;
-  viewStates?: ViewState[];
+  viewState?: ViewState;
   isAutoOpening: boolean;     // is auto-opening or switching
   isSnapshot: boolean;        // current model is snapshot
   wantSnapshot: boolean;      // selecting snapshot?
@@ -37,7 +37,7 @@ export interface AppState {
   isOpening: boolean;         // is opening another snapshot/iModel
 }
 
-/** A component the renders the whole application UI */
+/** A component that renders the whole application UI */
 export default class App extends React.Component<{}, AppState> {
 
   /** Creates an App instance */
@@ -64,7 +64,8 @@ export default class App extends React.Component<{}, AppState> {
         isAuthorized: SampleApp.oidcClient.isAuthorized,
         isLoading: false,
       },
-      imodel: undefined, viewStates: undefined,
+      imodel: undefined,
+      viewState: undefined,
       isAutoOpening: true,
       isSnapshot: false,
       wantSnapshot: false,
@@ -72,10 +73,10 @@ export default class App extends React.Component<{}, AppState> {
       isOpening: false,
     };
 
-    // If a snapshot is configured in config.json, then cache in local storage
+    // If a snapshot is configured in .env.local, then cache in local storage
     // to use for auto-opening at startup
     try {
-      const snapshotName: string | null = ""; // Config.App.get("imjs_offline_imodel");
+      const snapshotName = Config.App.get("imjs_offline_imodel");
       if (snapshotName) {
         window.localStorage.setItem("imjs_offline_imodel", snapshotName);
         window.localStorage.setItem("imjs_test_project", "");
@@ -83,7 +84,7 @@ export default class App extends React.Component<{}, AppState> {
       }
     } catch (e) {}
 
-    // Otherwise, if project/imodel are configured in config.json, then cache them in local storage
+    // Otherwise, if project/iModel are configured in .env.local, then cache them in local storage
     // to use for auto-opening at startup
     const localSnapshotName = window.localStorage.getItem("imjs_offline_imodel");
     if (localSnapshotName && localSnapshotName.length > 0)
@@ -101,7 +102,7 @@ export default class App extends React.Component<{}, AppState> {
         window.localStorage.setItem("imjs_test_project", projectName);
         window.localStorage.setItem("imjs_test_imodel", imodelName);
       } else {
-        // Check if we cached a snapshot or project/imodel to reuse
+        // Check if we cached a snapshot or project/iModel to reuse
         projectName = window.localStorage.getItem("imjs_test_project");
         imodelName = window.localStorage.getItem("imjs_test_imodel");
         const snapshotPath = window.localStorage.getItem("imjs_offline_imodel");
@@ -126,7 +127,7 @@ export default class App extends React.Component<{}, AppState> {
         const snapshot: boolean = switchState === SwitchState.SelectSnapshot;
         this.setState({ isSelecting: true, wantSnapshot: snapshot });
       } else if (switchState === SwitchState.OpenIt)
-        this.setState({ imodel: undefined, viewStates: undefined, isSelecting: false });
+        this.setState({ imodel: undefined, viewState: undefined, isSelecting: false });
     });
 
     const onOpenedListener = async (_iModel: IModelConnection) => {
@@ -155,8 +156,8 @@ export default class App extends React.Component<{}, AppState> {
     await SampleApp.oidcClient.signIn(new FrontendRequestContext());
   }
 
-  /** Pick the first two available spatial, orthographic or drawing view definitions in the imodel */
-  private async getFirstTwoViewDefinitions(imodel: IModelConnection): Promise<ViewState[]> {
+  /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
+  private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState> {
     const viewSpecs = await imodel.views.queryProps({});
     const acceptedViewClasses = [
       "BisCore:SpatialViewDefinition",
@@ -165,33 +166,27 @@ export default class App extends React.Component<{}, AppState> {
     ];
     const acceptedViewSpecs = viewSpecs.filter((spec) => (-1 !== acceptedViewClasses.indexOf(spec.classFullName)));
     if (1 > acceptedViewSpecs.length)
-      throw new Error("No valid view definitions in imodel");
+      throw new Error(IModelApp.i18n.translate("SampleApp:noViewDefinition"));
 
-    const viewStates: ViewState[] = [];
-    for (const viewDef of acceptedViewSpecs) {
-      const viewState = await imodel.views.load(viewDef.id!);
-      viewStates.push(viewState);
-    }
-
-    return viewStates;
+    return imodel.views.load(acceptedViewSpecs[0].id!);
   }
 
   /** Handle iModel open event */
   private _onIModelSelected = async (imodel: IModelConnection | undefined) => {
     if (!imodel) {
       // reset the state when imodel is closed
-      this.setState({ imodel: undefined, viewStates: undefined, isSelecting: true, isOpening: false });
+      this.setState({ imodel: undefined, viewState: undefined, isSelecting: true, isOpening: false });
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       UiFramework.setIModelConnection(undefined);
       return;
     }
     try {
-      // attempt to get ViewState for the first two available view definitions
-      const viewStates = await this.getFirstTwoViewDefinitions(imodel);
-      if (viewStates) {
+      // attempt to get ViewState for the first available view definition
+      const viewState = await this.getFirstViewDefinition(imodel);
+      if (viewState) {
         this.setState(
-          { imodel, viewStates, isOpening: false },
-          () => { AppUi.handleIModelViewsSelected(imodel, viewStates); },
+          { imodel, viewState, isOpening: false },
+          () => { AppUi.handleIModelViewsSelected(imodel, viewState); },
         );
       }
     } catch (e) {
@@ -200,23 +195,23 @@ export default class App extends React.Component<{}, AppState> {
 
       // Don't stay in selecting state if we were selecting a snapshot
       const isSelecting: boolean = this.state.wantSnapshot ? false : true;
-      this.setState({ imodel: undefined, viewStates: undefined, isSelecting, isOpening: false });
+      this.setState({ imodel: undefined, viewState: undefined, isSelecting, isOpening: false });
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       alert(e.message);
     }
   }
 
-    /** The component's render method */
+  /** The component's render method */
   public render() {
     let ui: React.ReactNode;
 
     if (this.state.user.isLoading) {
-      // if OIDC is initializing or user is currently being loaded, just tell that
+      // if OIDC is initializing or user is currently being loaded, just show that
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:signing-in")}...</span>;
     } else if (!SampleApp.oidcClient.hasSignedIn && !this.state.wantSnapshot) {
       ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
     } else if (this.state.isOpening) {
-      // if model is currently being opened, just tell that
+      // if iModel is currently being opened, just show that
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:opening")}...</span>;
     } else if (this.state.isSelecting) {
       if (this.state.wantSnapshot)
@@ -224,7 +219,7 @@ export default class App extends React.Component<{}, AppState> {
       else {
         ui = <IModelComponents selectIModel={true}/>;
       }
-    } else if (!this.state.imodel || !this.state.viewStates) {
+    } else if (!this.state.imodel || !this.state.viewState) {
       ui = <IModelComponents openIModel={this._handleOpen}/>;
     } else {
       // if we do have an imodel and view definition id - render imodel components
@@ -304,8 +299,7 @@ export default class App extends React.Component<{}, AppState> {
       imodel = await SnapshotConnection.openFile(localSnapshotName);
     } catch (e) {
       window.localStorage.setItem("imjs_offline_imodel", "");
-      const errMsg = "Error opening snapshot: " + localSnapshotName + " -- " + e;
-
+      const errMsg = IModelApp.i18n.translate("SampleApp:errorOpenSnapshot", {localSnapshotName, e});
       const con = this.getRemote().getGlobal("console");
       con.log(errMsg);
       window.close();
@@ -338,7 +332,7 @@ export default class App extends React.Component<{}, AppState> {
       project = await connectClient.getProject(requestContext, { $filter: `Name+eq+'${projectName}'` });
     } catch (e) {
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
-      throw new Error(`Project with name "${projectName}" does not exist`);
+      throw new Error(IModelApp.i18n.translate("SampleApp:noProject", {projectName}));
     }
 
     const imodelQuery = new IModelQuery();
@@ -346,7 +340,7 @@ export default class App extends React.Component<{}, AppState> {
     const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
     if (imodels.length === 0) {
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
-      throw new Error(`iModel with name "${imodelName}" does not exist in project "${projectName}"`);
+      throw new Error(IModelApp.i18n.translate("SampleApp:noIModel", {imodelName, projectName}));
     }
     this.setState({ isOpening: true, isSnapshot: false });
 

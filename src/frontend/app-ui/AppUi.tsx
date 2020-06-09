@@ -26,16 +26,16 @@ export class AppUi {
   }
 
   /** Handle when an iModel and the views have been selected  */
-  public static handleIModelViewsSelected(iModelConnection: IModelConnection, viewStates: ViewState[]): void {
+  public static handleIModelViewsSelected(iModelConnection: IModelConnection, viewState: ViewState): void {
     // Set the iModelConnection in the Redux store
     UiFramework.setIModelConnection(iModelConnection);
-    UiFramework.setDefaultViewState(viewStates[0]);
+    UiFramework.setDefaultViewState(viewState);
 
     // Tell the SyncUiEventDispatcher about the iModelConnection
     SyncUiEventDispatcher.initializeConnectionEvents(iModelConnection);
 
     // We create a FrontStage that contains the views that we want.
-    const frontstageProvider: FrontstageProvider = new SampleFrontstage(viewStates) as FrontstageProvider;
+    const frontstageProvider: FrontstageProvider = new SampleFrontstage(viewState) as FrontstageProvider;
     FrontstageManager.addFrontstageProvider(frontstageProvider);
 
     // tslint:disable-next-line:no-floating-promises

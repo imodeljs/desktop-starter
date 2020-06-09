@@ -3,7 +3,7 @@
 Copyright © Bentley Systems, Inc.
 
 This iModel.js desktop sample application uses the Bentley 9-Zone UI layout pattern and demonstrates opening an iModel and viewing its data.
-For an overview of the 9-Zone UI layout pattern, see [9-Zone UI Pattern](https://imodeljs.github.io/iModelJs-docs-output//learning/ui/ninezone/).
+For an overview of the 9-Zone UI layout pattern, see [9-Zone UI Pattern](https://www.imodeljs.org/learning/ui/ninezone/).
 
 The data is presented using the following components:
 
@@ -32,7 +32,7 @@ The purpose of this application is to demonstrate the following:
   * Content view ( [Viewport](./src/frontend/components/Viewport.tsx) )
   * [Backstage](./src/frontend/app-ui/backstage/AppBackstageItemProvider.tsx)
 
-For more information about developing a 9-Zone app, see [Learning ui-framework Package](https://imodeljs.github.io/iModelJs-docs-output//learning/ui/framework/).
+For more information about developing a 9-Zone app, see [Learning ui-framework Package](https://www.imodeljs.org/learning/ui/framework/).
 
 ## Development setup
 
@@ -42,7 +42,7 @@ For more information about developing a 9-Zone app, see [Learning ui-framework P
 
     Create a *Desktop* app registration with <http://localhost:3000/signin-callback> as a valid redirect URI. The client ID should start with "native-".
 
-    Note: If you are just testing on localhost you can use the default registration included in the sample. However, it's recommended that you complete the registration, especially since registration is a requirement before the application can be deployed. For more information, see the section on [authorization](https://imodeljs.org/learning/common/accesstoken/).
+    Note: If you are just testing on localhost you can use the default registration included in the sample. However, it's recommended that you complete the registration, especially since registration is a requirement before the application can be deployed. For more information, see the section on [authorization](https://www.imodeljs.org/learning/common/accesstoken/).
 
 3. Configure your app using the values you obtained from the registration process.  To do so, edit the `.env.local` file.
 
@@ -52,24 +52,10 @@ For more information about developing a 9-Zone app, see [Learning ui-framework P
     npm install
     ```
 
-5. Build the app:
-
-    ```sh
-    npm run build
-    ```
-
 6. Start the app:
-
-      for debugging:
 
       ```sh
       npm start
-      ```
-
-      or just:
-
-      ```sh
-      npm run electron
       ```
 
 ## Contributing
