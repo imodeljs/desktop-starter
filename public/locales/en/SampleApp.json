@@ -1,0 +1,16 @@
+{
+  "signing-in": "Signing-in",
+  "opening": "Opening",
+  "components": {
+    "imodel-picker": {
+      "open-imodel": "Open Sample iModel",
+      "signout": "Sign Out"
+    },
+    "properties": "Properties"
+  },
+  "backstage": {
+    "sampleFrontstage": "Sample Frontstage",
+    "selectIModel": "Select iModel",
+    "selectSnapshot": "Select Snapshot"
+  }
+}
