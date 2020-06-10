@@ -55,7 +55,7 @@ export default class App extends React.Component<{}, AppState> {
     let defaultPath = "assets";
     if (this.getRemote().app.isPackaged)
       defaultPath = path.join("resources", "app", "assets");
-    return path.join(defaultPath, "Campus.bim");
+    return path.join(defaultPath, "Baytown.bim");
   }
 
   private initialize(): any {
