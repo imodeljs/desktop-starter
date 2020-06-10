@@ -5,11 +5,10 @@
 import * as React from "react";
 import { ViewState } from "@bentley/imodeljs-frontend";
 import {
-  ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef, Frontstage,
-  FrontstageProvider, IModelConnectedNavigationWidget, IModelConnectedViewSelector, IModelViewportControl,
-  ItemList, StagePanel, SyncUiEventId, ToolWidget, UiFramework, Widget, WidgetState, Zone, ZoneState,
+  BackstageManager, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef, Frontstage,
+  FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl,
+  ItemList, StagePanel, SyncUiEventId, ToolbarHelper, ToolWidget, UiFramework, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
-import { AppUi } from "../AppUi";
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 
 /**
@@ -40,6 +39,11 @@ export class SampleFrontstage extends FrontstageProvider {
     });
   }
 
+  private get _additionalNavigationVerticalToolbarItems() {
+    return [
+      ToolbarHelper.createToolbarItemFromItemDef(200, this._viewSelectorItemDef)];
+  }
+
   /** Define the Frontstage properties */
   public get frontstage() {
 
@@ -59,7 +63,7 @@ export class SampleFrontstage extends FrontstageProvider {
           <Zone
             widgets={[
               /** Use standard NavigationWidget delivered in ui-framework */
-              <Widget isFreeform={true} element={<IModelConnectedNavigationWidget suffixVerticalItems={new ItemList([this._viewSelectorItemDef])} />} />,
+              <Widget isFreeform={true} element={<BasicNavigationWidget additionalVerticalItems={this._additionalNavigationVerticalToolbarItems} />} />,
             ]}
           />
         }
@@ -120,7 +124,7 @@ class SampleToolWidget extends React.Component {
 
     return (
       <ToolWidget
-        appButton={AppUi.backstageToggleCommand}
+        appButton={BackstageManager.getBackstageToggleCommand()}
         horizontalItems={horizontalItems}
       />
     );

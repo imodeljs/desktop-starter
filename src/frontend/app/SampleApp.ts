@@ -22,8 +22,8 @@ export class SampleApp {
 
   public static async startup(): Promise<void> {
 
-    // Use the AppNotificationManager subclass from ui-framework to get prompts and messages
     const opts: IModelAppOptions = {applicationVersion: "1.0.0"};
+    // Use the AppNotificationManager subclass from ui-framework to get prompts and messages
     opts.notifications = new AppNotificationManager();
 
     await IModelApp.startup(opts);

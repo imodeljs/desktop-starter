@@ -3,7 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { IModelConnection, ViewState } from "@bentley/imodeljs-frontend";
-import { Backstage, ConfigurableUiManager, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
+import { ConfigurableUiManager, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
 import { SampleFrontstage } from "./frontstages/SampleFrontstage";
 import { IModelSelectFrontstage } from "./frontstages/IModelSelectFrontstage";
 
@@ -18,11 +18,6 @@ export class AppUi {
 
     // Create a FrontStage where we can select a project/iModel.
     FrontstageManager.addFrontstageProvider(new IModelSelectFrontstage());
-  }
-
-  // Command that toggles the backstage
-  public static get backstageToggleCommand() {
-    return Backstage.backstageToggleCommand;
   }
 
   /** Handle when an iModel and the views have been selected  */
