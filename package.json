@@ -54,7 +54,7 @@
     "@bentley/frontend-authorization-client": "^2.0.0",
     "@bentley/geometry-core": "^2.0.0",
     "@bentley/icons-generic-webfont": "^1.0.0",
-    "@bentley/imodel-select-react": "file:bentley-imodel-select-react-2.0.0.tgz",
+    "@bentley/imodel-select-react": "^2.0.0",
     "@bentley/imodelhub-client": "^2.0.0",
     "@bentley/imodeljs-backend": "^2.0.0",
     "@bentley/imodeljs-common": "^2.0.0",

@@ -1,4 +1,5 @@
 .env
+assets/Campus.bim.Tiles
 node_modules
 build
 lib
