@@ -50,8 +50,6 @@ export default class App extends React.Component<{}, AppState> {
         isAuthorized: SampleApp.oidcClient.isAuthorized,
         isLoading: false,
       },
-      imodel: undefined,
-      viewState: undefined,
       isOpening: false,
     };
 
@@ -117,6 +115,8 @@ export default class App extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     SampleApp.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
+    // tslint:disable-next-line: no-floating-promises
+    this._handleOpen();
   }
 
   public componentWillUnmount() {
@@ -153,7 +153,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   /** Handle iModel open event */
-  private _onIModelSelected = async (imodel: IModelConnection | undefined) => {
+  private _onIModelOpened = async (imodel: IModelConnection | undefined) => {
     if (!imodel) {
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       UiFramework.setIModelConnection(undefined);
@@ -183,13 +183,11 @@ export default class App extends React.Component<{}, AppState> {
     if (this.state.user.isLoading) {
       // if OIDC is initializing or user is currently being loaded, just show that
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:signing-in")}...</span>;
-    } else if (!SampleApp.oidcClient.hasSignedIn && !this._wantSnapshot) {
+    } else if (!this.state.user.isAuthorized && !this._wantSnapshot) {
       ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
     } else if (this.state.isOpening) {
       // if iModel is currently being opened, just show that
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:opening")}...</span>;
-    } else if (!this.state.imodel || !this.state.viewState) {
-      SampleApp.store.dispatch({ type: "App:OPEN_IT" });
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents/>;
@@ -234,6 +232,10 @@ export default class App extends React.Component<{}, AppState> {
 
   private _handleOpen = async () => {
 
+    // Make sure user is signed in before attempting to open an iModel
+    if (!this._wantSnapshot && !this.state.user.isAuthorized)
+      return;
+
     this.setState({ isOpening: true});
 
     if (this._wantSnapshot)
@@ -260,7 +262,7 @@ export default class App extends React.Component<{}, AppState> {
     }
 
     if (imodel)
-      await this._onIModelSelected(imodel);
+      await this._onIModelOpened(imodel);
     else
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
   }
@@ -292,19 +294,12 @@ export default class App extends React.Component<{}, AppState> {
     let imodel: IModelConnection | undefined;
     imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);
 
-    await this._onIModelSelected(imodel);
+    await this._onIModelOpened(imodel);
   }
 }
 
-/** React props for [[IModelComponents]] component */
-interface IModelComponentsProps {
-  selectIModel?: boolean;
-  selectSnapshot?: () => void;
-  openIModel?: () => void;
-}
-
 /** Renders a viewport and a property grid */
-class IModelComponents extends React.PureComponent<IModelComponentsProps> {
+class IModelComponents extends React.PureComponent {
 
   private _provider = new AppBackstageItemProvider();
 
