@@ -11,7 +11,6 @@ export enum SwitchState {
   SelectIModel = 1,
   SelectSnapshot = 2,
   OpenIt = 3,
-  ClearState = 4,
 }
 
 // State handling for switching iModels
@@ -27,7 +26,6 @@ export const SwitchIModelActions = {
   selectIModel: () => createAction("App:SELECT_IMODEL", {}),
   selectSnapshot: () => createAction("App:SELECT_SNAPSHOT", {}),
   openIt: () => createAction("App:OPEN_IT", {}),
-  reset: () => createAction("App:CLEAR_STATE", {}),
 };
 
 export type SwitchIModelActionsUnion = ActionsUnion<typeof SwitchIModelActions>;
@@ -40,8 +38,6 @@ function AppReducer(state: SwitchIModelState = initialState, action: SwitchIMode
       return { ...state, switchState: SwitchState.SelectSnapshot };
     case "App:OPEN_IT":
       return { ...state, switchState: SwitchState.OpenIt };
-    case "App:CLEAR_STATE":
-      return { ...state, switchState: SwitchState.ClearState };
   }
   return { ...state, switchState: SwitchState.None };
 }

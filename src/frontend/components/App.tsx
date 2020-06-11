@@ -27,8 +27,6 @@ export interface AppState {
     isAuthorized: boolean;
     isLoading?: boolean;
   };
-  imodel?: IModelConnection;
-  viewState?: ViewState;
   isOpening: boolean;         // is opening a snapshot/iModel
 }
 
@@ -74,8 +72,6 @@ export default class App extends React.Component<{}, AppState> {
         await this._handleSelectSnapshot();
       } else if (switchState === SwitchState.OpenIt) {
         await this._handleOpen();
-      } else if (switchState === SwitchState.ClearState) {
-        this.setState({ imodel: undefined, viewState: undefined, isOpening: false });
       }
     });
   }
@@ -155,7 +151,7 @@ export default class App extends React.Component<{}, AppState> {
   /** Handle iModel open event */
   private _onIModelOpened = async (imodel: IModelConnection | undefined) => {
     if (!imodel) {
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
       UiFramework.setIModelConnection(undefined);
       return;
     }
@@ -163,15 +159,14 @@ export default class App extends React.Component<{}, AppState> {
       // attempt to get ViewState for the first available view definition
       const viewState = await this.getFirstViewDefinition(imodel);
       if (viewState) {
-        this.setState(
-          { imodel, viewState, isOpening: false },
+        this.setState({ isOpening: false },
           () => { AppUi.handleIModelViewsSelected(imodel, viewState); },
         );
       }
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
       alert(e.message);
     }
   }
@@ -226,8 +221,7 @@ export default class App extends React.Component<{}, AppState> {
         UiFramework.setIModelConnection(undefined);
       }
       await this._handleOpenSnapshot();
-    } else
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+    }
   }
 
   private _handleOpen = async () => {
@@ -264,12 +258,12 @@ export default class App extends React.Component<{}, AppState> {
     if (imodel)
       await this._onIModelOpened(imodel);
     else
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
   }
 
   private _handleOpenImodel = async () => {
     if (!this._projectName || !this._projectName.length || !this._imodelName || !this._imodelName.length) {
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
       return;
     }
     const requestContext: AuthorizedFrontendRequestContext = await AuthorizedFrontendRequestContext.create();
@@ -278,7 +272,7 @@ export default class App extends React.Component<{}, AppState> {
     try {
       project = await connectClient.getProject(requestContext, { $filter: `Name+eq+'${this._projectName}'` });
     } catch (e) {
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
       throw new Error(IModelApp.i18n.translate("SampleApp:noProject", {projectName: this._projectName}));
     }
 
@@ -286,7 +280,7 @@ export default class App extends React.Component<{}, AppState> {
     imodelQuery.byName(this._imodelName);
     const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
     if (imodels.length === 0) {
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
+      this.setState({ isOpening: false });
       throw new Error(IModelApp.i18n.translate("SampleApp:noIModel", {imodelName: this._imodelName, projectName: this._projectName}));
     }
     this.setState({ isOpening: true });
