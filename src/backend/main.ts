@@ -8,7 +8,6 @@ import { IModelJsElectronManager, StandardElectronManager, WebpackDevServerElect
 import { IModelHost } from "@bentley/imodeljs-backend";
 import { Presentation } from "@bentley/presentation-backend";
 import { ElectronRpcManager, RpcInterfaceDefinition } from "@bentley/imodeljs-common";
-import { ArgReaderRpcImpl } from "./ArgReaderRpcImpl";
 import { getSupportedRpcs } from "../common/rpcs";
 import { AppLoggerCategory } from "../common/LoggerCategory";
 import {app} from "electron";
@@ -52,8 +51,6 @@ async function initialize(rpcs: RpcInterfaceDefinition[]) {
     // Initialize iModelHost
     await IModelHost.startup();
 
-    ArgReaderRpcImpl.register();
-
     // Initialize Presentation
     Presentation.initialize();
 
@@ -62,12 +59,6 @@ async function initialize(rpcs: RpcInterfaceDefinition[]) {
     // do initialize
     await initialize(rpcs);
 
-    // store the command line args where they can be retrieved
-    let args = process.argv.slice(2);
-    if (app.isPackaged)
-      args = process.argv.slice(1);
-
-    ArgReaderRpcImpl.setArgs(args);
   } catch (error) {
     Logger.logError(AppLoggerCategory.Backend, error);
     process.exitCode = 1;

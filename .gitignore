@@ -1,4 +1,5 @@
 .env
+assets/Baytown.bim.HierarchyCache.db
 assets/Baytown.bim.Tiles
 node_modules
 build
