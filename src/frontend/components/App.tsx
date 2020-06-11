@@ -31,20 +31,39 @@ export interface AppState {
   imodel?: IModelConnection;
   viewState?: ViewState;
   isAutoOpening: boolean;     // is auto-opening or switching
-  isSnapshot: boolean;        // current model is snapshot
   wantSnapshot: boolean;      // selecting snapshot?
-  isSelecting: boolean;       // is selecting another snapshot/iModel
   isOpening: boolean;         // is opening another snapshot/iModel
 }
 
 /** A component that renders the whole application UI */
 export default class App extends React.Component<{}, AppState> {
+  private _subscription: any;
 
   /** Creates an App instance */
   constructor(props?: any, context?: any) {
     super(props, context);
 
     this.state = this.initialize();
+
+    this.addSwitchStateSubscription();
+  }
+
+  private addSwitchStateSubscription() {
+    this._subscription = SampleApp.store.subscribe(async () => {
+      const switchState = SampleApp.store.getState().switchIModelState!.switchState;
+      if (switchState === SwitchState.SelectIModel) {
+        this.setState({ wantSnapshot: false });
+        const frontstageDef = FrontstageManager.findFrontstageDef("IModelSelector");
+        await FrontstageManager.setActiveFrontstageDef(frontstageDef);
+      } else if (switchState === SwitchState.SelectSnapshot) {
+        this.setState({ wantSnapshot: true });
+        await this._handleSelectSnapshot();
+      } else if (switchState === SwitchState.OpenIt) {
+        await this._handleOpen();
+      } else if (switchState === SwitchState.ClearState) {
+        this.setState({ imodel: undefined, viewState: undefined, isOpening: false });
+      }
+    });
   }
 
   private getRemote(): any {
@@ -67,9 +86,7 @@ export default class App extends React.Component<{}, AppState> {
       imodel: undefined,
       viewState: undefined,
       isAutoOpening: true,
-      isSnapshot: false,
       wantSnapshot: false,
-      isSelecting: false,
       isOpening: false,
     };
 
@@ -121,25 +138,11 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    SampleApp.store.subscribe(async () => {
-      const switchState = SampleApp.store.getState().switchIModelState!.switchState;
-      if (switchState === SwitchState.SelectIModel || switchState === SwitchState.SelectSnapshot) {
-        const snapshot: boolean = switchState === SwitchState.SelectSnapshot;
-        this.setState({ isSelecting: true, wantSnapshot: snapshot });
-      } else if (switchState === SwitchState.OpenIt)
-        this.setState({ imodel: undefined, viewState: undefined, isSelecting: false });
-    });
-
-    const onOpenedListener = async (_iModel: IModelConnection) => {
-      SampleApp.store.dispatch({ type: "App:CLEAR_STATE"});
-    };
-
-    IModelConnection.onOpen.addListener(onOpenedListener);
-
     SampleApp.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
   }
 
   public componentWillUnmount() {
+    this._subscription.unsubscribe();
     SampleApp.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
@@ -174,8 +177,6 @@ export default class App extends React.Component<{}, AppState> {
   /** Handle iModel open event */
   private _onIModelSelected = async (imodel: IModelConnection | undefined) => {
     if (!imodel) {
-      // reset the state when imodel is closed
-      this.setState({ imodel: undefined, viewState: undefined, isSelecting: true, isOpening: false });
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       UiFramework.setIModelConnection(undefined);
       return;
@@ -192,10 +193,6 @@ export default class App extends React.Component<{}, AppState> {
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
-
-      // Don't stay in selecting state if we were selecting a snapshot
-      const isSelecting: boolean = this.state.wantSnapshot ? false : true;
-      this.setState({ imodel: undefined, viewState: undefined, isSelecting, isOpening: false });
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       alert(e.message);
     }
@@ -213,14 +210,8 @@ export default class App extends React.Component<{}, AppState> {
     } else if (this.state.isOpening) {
       // if iModel is currently being opened, just show that
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:opening")}...</span>;
-    } else if (this.state.isSelecting) {
-      if (this.state.wantSnapshot)
-        ui = <IModelComponents selectSnapshot={this._handleSelectSnapshot}/>;
-      else {
-        ui = <IModelComponents selectIModel={true}/>;
-      }
     } else if (!this.state.imodel || !this.state.viewState) {
-      ui = <IModelComponents openIModel={this._handleOpen}/>;
+      SampleApp.store.dispatch({ type: "App:OPEN_IT" });
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents/>;
@@ -260,14 +251,13 @@ export default class App extends React.Component<{}, AppState> {
         UiFramework.setIModelConnection(undefined);
       }
       SampleApp.store.dispatch({ type: "App:OPEN_IT" });
-    } else {
-      this.setState({isSelecting: false, isOpening: false });
+    } else
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
-    }
   }
 
   private _handleOpen = async () => {
 
+    let wantSnapshot = this.state.wantSnapshot;
     if (this.state.isAutoOpening) {
       // If snapshot file is specified on command line args, override cached snapshot file
       const args: any[] = await ArgReaderRpcInterface.getClient().fetchArgs();
@@ -275,11 +265,14 @@ export default class App extends React.Component<{}, AppState> {
         const snapshotName = args[0];
         if (snapshotName && snapshotName.length > 0) {
           window.localStorage.setItem("imjs_offline_imodel", snapshotName);
-          this.setState({ wantSnapshot: true });
+          wantSnapshot = true;
         }
       }
     }
-    if (this.state.wantSnapshot)
+
+    this.setState({ isOpening: true, isAutoOpening: false, wantSnapshot });
+
+    if (wantSnapshot)
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
@@ -290,8 +283,6 @@ export default class App extends React.Component<{}, AppState> {
     let localSnapshotName = window.localStorage.getItem("imjs_offline_imodel");
     if (!localSnapshotName || localSnapshotName.length === 0)
       localSnapshotName = this.getDefaultSnapshot();
-
-    this.setState({ isOpening: true, isSnapshot: true, isAutoOpening: false });
 
     let imodel: IModelConnection | undefined;
     try {
@@ -313,7 +304,6 @@ export default class App extends React.Component<{}, AppState> {
       window.localStorage.setItem("imjs_test_imodel", "");
     } else {
       window.localStorage.setItem("imjs_offline_imodel", "");
-      this.setState({isSelecting: false, isOpening: false });
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
     }
   }
@@ -342,7 +332,7 @@ export default class App extends React.Component<{}, AppState> {
       SampleApp.store.dispatch({ type: "App:CLEAR_STATE" });
       throw new Error(IModelApp.i18n.translate("SampleApp:noIModel", {imodelName, projectName}));
     }
-    this.setState({ isOpening: true, isSnapshot: false });
+    this.setState({ isOpening: true });
 
     let imodel: IModelConnection | undefined;
     imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);
@@ -353,14 +343,14 @@ export default class App extends React.Component<{}, AppState> {
   }
 }
 
-/** React props for [[OpenIModelButton]] component */
+/** React props for [[IModelComponents]] component */
 interface IModelComponentsProps {
   selectIModel?: boolean;
   selectSnapshot?: () => void;
   openIModel?: () => void;
 }
 
-/** Renders a viewport, a tree, a property grid and a table */
+/** Renders a viewport and a property grid */
 class IModelComponents extends React.PureComponent<IModelComponentsProps> {
 
   private _provider = new AppBackstageItemProvider();
@@ -374,14 +364,6 @@ class IModelComponents extends React.PureComponent<IModelComponentsProps> {
   }
 
   public render() {
-    if (this.props.selectIModel) {
-      const frontstageDef = FrontstageManager.findFrontstageDef("IModelSelector");
-      FrontstageManager.setActiveFrontstageDef(frontstageDef); // tslint:disable-line:no-floating-promises
-    } else if (this.props.selectSnapshot)
-      this.props.selectSnapshot();
-    else if (this.props.openIModel)
-      this.props.openIModel();
-
     return (
       <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
     );
