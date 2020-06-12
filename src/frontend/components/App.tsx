@@ -65,13 +65,21 @@ export default class App extends React.Component<{}, AppState> {
       const switchState = SampleApp.store.getState().switchIModelState!.switchState;
       if (switchState === SwitchState.SelectIModel) {
         this._wantSnapshot = false;
+        // Trigger sign-in if not authorized yet
+        if (!this.state.user.isAuthorized)
+          this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
         const frontstageDef = FrontstageManager.findFrontstageDef("IModelSelector");
         await FrontstageManager.setActiveFrontstageDef(frontstageDef);
       } else if (switchState === SwitchState.SelectSnapshot) {
         this._wantSnapshot = true;
         await this._handleSelectSnapshot();
       } else if (switchState === SwitchState.OpenIt) {
-        await this._handleOpen();
+        const selectedIModel = SampleApp.store.getState().switchIModelState.selectedIModel;
+        if (selectedIModel) {
+          this._projectName = selectedIModel.projectName;
+          this._imodelName = selectedIModel.imodelName;
+          await this._handleOpen();
+        }
       }
     });
   }

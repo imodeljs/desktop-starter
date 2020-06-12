@@ -20,10 +20,6 @@ class IModelSelectorControl extends ContentControl {
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
 
     FrontstageManager.closeModalFrontstage();
-    window.localStorage.setItem("imjs_test_project", iModelInfo.projectInfo.name);
-    window.localStorage.setItem("imjs_test_imodel", iModelInfo.name);
-    window.localStorage.setItem("imjs_offline_imodel", "");
-
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
@@ -31,7 +27,7 @@ class IModelSelectorControl extends ContentControl {
       UiFramework.setIModelConnection(undefined);
     }
 
-    SampleApp.store.dispatch({type: "App:OPEN_IT"});
+    SampleApp.store.dispatch({type: "App:OPEN_IT", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
   }
 }
 

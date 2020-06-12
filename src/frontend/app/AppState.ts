@@ -13,19 +13,27 @@ export enum SwitchState {
   OpenIt = 3,
 }
 
+export interface SelectedIModel {
+  imodelName: string;
+  projectName: string;
+}
+
 // State handling for switching iModels
 export interface SwitchIModelState {
   switchState: SwitchState;
+  selectedIModel: SelectedIModel | null;
 }
 
-const initialState: SwitchIModelState = { switchState: SwitchState.None,
+const initialState: SwitchIModelState = {
+  switchState: SwitchState.None,
+  selectedIModel: null,
 };
 
 // tslint:disable-next-line:variable-name
 export const SwitchIModelActions = {
   selectIModel: () => createAction("App:SELECT_IMODEL", {}),
   selectSnapshot: () => createAction("App:SELECT_SNAPSHOT", {}),
-  openIt: () => createAction("App:OPEN_IT", {}),
+  openIt: (selectedIModel: SelectedIModel) => createAction("App:OPEN_IT", selectedIModel),
 };
 
 export type SwitchIModelActionsUnion = ActionsUnion<typeof SwitchIModelActions>;
@@ -37,9 +45,10 @@ function AppReducer(state: SwitchIModelState = initialState, action: SwitchIMode
     case "App:SELECT_SNAPSHOT":
       return { ...state, switchState: SwitchState.SelectSnapshot };
     case "App:OPEN_IT":
-      return { ...state, switchState: SwitchState.OpenIt };
+      return { ...state, switchState: SwitchState.OpenIt, selectedIModel: action.payload };
+    default:
+      return { ...state, switchState: SwitchState.None };
   }
-  return { ...state, switchState: SwitchState.None };
 }
 
 // React-redux interface stuff
