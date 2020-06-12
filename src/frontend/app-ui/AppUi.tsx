@@ -21,7 +21,7 @@ export class AppUi {
   }
 
   /** Handle when an iModel and the views have been selected  */
-  public static handleIModelViewsSelected(iModelConnection: IModelConnection, viewState: ViewState): void {
+  public static handleIModelViewsSelected = async (iModelConnection: IModelConnection, viewState: ViewState) => {
     // Set the iModelConnection in the Redux store
     UiFramework.setIModelConnection(iModelConnection);
     UiFramework.setDefaultViewState(viewState);
@@ -33,10 +33,7 @@ export class AppUi {
     const frontstageProvider: FrontstageProvider = new SampleFrontstage(viewState) as FrontstageProvider;
     FrontstageManager.addFrontstageProvider(frontstageProvider);
 
-    // tslint:disable-next-line:no-floating-promises
-    FrontstageManager.setActiveFrontstageDef(frontstageProvider.frontstageDef).then(() => {
-      // Frontstage is ready
-    });
+    await FrontstageManager.setActiveFrontstageDef(frontstageProvider.frontstageDef);
   }
 
 }

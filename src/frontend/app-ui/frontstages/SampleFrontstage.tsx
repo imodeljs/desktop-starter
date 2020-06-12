@@ -22,7 +22,7 @@ export class SampleFrontstage extends FrontstageProvider {
   // Content group for both layouts
   private _contentGroup: ContentGroup;
 
-  constructor(public viewStates: ViewState) {
+  constructor(public viewState: ViewState) {
     super();
 
     this._contentLayoutDef = new ContentLayoutDef({});
@@ -31,7 +31,7 @@ export class SampleFrontstage extends FrontstageProvider {
         {
           classId: IModelViewportControl,
           applicationData: {
-            viewState: this.viewStates,
+            viewState: this.viewState,
             iModelConnection: UiFramework.getIModelConnection(),
           },
         },

@@ -6,20 +6,18 @@ import * as React from "react";
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
 import { SampleApp } from "../../app/SampleApp";
 import { ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
-  FrontstageManager, FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, UiFramework,
+  FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, UiFramework,
 } from "@bentley/ui-framework";
 
 class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {
     super(info, options);
 
-    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel} showSignoutButton={true} showBackstageButton={true} />;
+    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel} showSignoutButton={false} showBackstageButton={true} />;
   }
 
   // called when an imodel has been selected on the IModelSelect
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
-
-    FrontstageManager.closeModalFrontstage();
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);

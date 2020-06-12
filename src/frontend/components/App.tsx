@@ -36,8 +36,8 @@ export default class App extends React.Component<{}, AppState> {
   private _snapshotName: string | null;
   private _projectName: string | null;
   private _imodelName: string | null;
-  private _wantSnapshot: boolean;      // selecting snapshot?
-
+  private _wantSnapshot: boolean;       // selecting snapshot?
+  private _isAutoOpen: boolean;         // auto-opening iModel?
 
   /** Creates an App instance */
   constructor(props?: any, context?: any) {
@@ -55,6 +55,7 @@ export default class App extends React.Component<{}, AppState> {
     this._projectName = null;
     this._imodelName = null;
     this._wantSnapshot = false;
+    this._isAutoOpen = true;
 
     this.initialize();
     this.addSwitchStateSubscription();
@@ -119,8 +120,13 @@ export default class App extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     SampleApp.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
-    // tslint:disable-next-line: no-floating-promises
-    this._handleOpen();
+    // Make sure user is signed in before attempting to open an iModel
+    if (!this._wantSnapshot && !this.state.user.isAuthorized)
+      this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
+    else {
+      // tslint:disable-next-line: no-floating-promises
+      this._handleOpen();
+    }
   }
 
   public componentWillUnmount() {
@@ -130,6 +136,11 @@ export default class App extends React.Component<{}, AppState> {
 
   private _onUserStateChanged = () => {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: SampleApp.oidcClient.isAuthorized, isLoading: false } }));
+
+    if (this._isAutoOpen && this.state.user.isAuthorized) {
+      // tslint:disable-next-line: no-floating-promises
+      this._handleOpen();
+    }
   }
 
   private _onRegister = () => {
@@ -158,8 +169,8 @@ export default class App extends React.Component<{}, AppState> {
 
   /** Handle iModel open event */
   private _onIModelOpened = async (imodel: IModelConnection | undefined) => {
+    this.setState({ isOpening: false });
     if (!imodel) {
-      this.setState({ isOpening: false });
       UiFramework.setIModelConnection(undefined);
       return;
     }
@@ -167,14 +178,11 @@ export default class App extends React.Component<{}, AppState> {
       // attempt to get ViewState for the first available view definition
       const viewState = await this.getFirstViewDefinition(imodel);
       if (viewState) {
-        this.setState({ isOpening: false },
-          () => { AppUi.handleIModelViewsSelected(imodel, viewState); },
-        );
+        await AppUi.handleIModelViewsSelected(imodel, viewState);
       }
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
-      this.setState({ isOpening: false });
       alert(e.message);
     }
   }
@@ -233,11 +241,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   private _handleOpen = async () => {
-
-    // Make sure user is signed in before attempting to open an iModel
-    if (!this._wantSnapshot && !this.state.user.isAuthorized)
-      return;
-
+    this._isAutoOpen = false;
     this.setState({ isOpening: true});
 
     if (this._wantSnapshot)
@@ -263,10 +267,7 @@ export default class App extends React.Component<{}, AppState> {
       process.exit(0);
     }
 
-    if (imodel)
-      await this._onIModelOpened(imodel);
-    else
-      this.setState({ isOpening: false });
+    await this._onIModelOpened(imodel);
   }
 
   private _handleOpenImodel = async () => {
@@ -291,7 +292,6 @@ export default class App extends React.Component<{}, AppState> {
       this.setState({ isOpening: false });
       throw new Error(IModelApp.i18n.translate("SampleApp:noIModel", {imodelName: this._imodelName, projectName: this._projectName}));
     }
-    this.setState({ isOpening: true });
 
     let imodel: IModelConnection | undefined;
     imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);

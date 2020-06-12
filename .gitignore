@@ -1,7 +1,7 @@
 .env
 assets/*.HierarchyCache*
 assets/*.TileCache*
-assets/*.Tiles
+assets/*.Tiles*
 node_modules
 build
 lib
