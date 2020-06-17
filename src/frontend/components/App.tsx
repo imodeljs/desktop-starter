@@ -103,7 +103,7 @@ export default class App extends React.Component<{}, AppState> {
       this._snapshotName = Config.App.get("imjs_offline_imodel");
     } catch (e) {}
 
-    if (this._snapshotName && this._snapshotName.length) {
+    if (this._snapshotName) {
       this._wantSnapshot = true;
     } else {
       try {
@@ -111,7 +111,7 @@ export default class App extends React.Component<{}, AppState> {
         this._projectName = Config.App.get("imjs_test_project", this._imodelName as string);
       } catch (e) {}
 
-      if (!this._projectName || !this._projectName.length || !this._imodelName || !this._imodelName.length) {
+      if (!this._projectName || !this._imodelName) {
         // If nothing was configured, then open the default snapshot
         this._snapshotName = this.getDefaultSnapshot();
         this._wantSnapshot = true;
@@ -162,7 +162,7 @@ export default class App extends React.Component<{}, AppState> {
       "BisCore:OrthographicViewDefinition",
     ];
     const acceptedViewSpecs = viewSpecs.filter((spec) => (-1 !== acceptedViewClasses.indexOf(spec.classFullName)));
-    if (1 > acceptedViewSpecs.length)
+    if (!acceptedViewSpecs)
       throw new Error(IModelApp.i18n.translate("SampleApp:noViewDefinition"));
 
     return imodel.views.load(acceptedViewSpecs[0].id!);
@@ -235,7 +235,7 @@ export default class App extends React.Component<{}, AppState> {
       filenames = this.getRemote().dialog.showOpenDialogSync(options);
     } catch (e) {}
 
-    if (filenames && filenames.length) {
+    if (filenames) {
       this._projectName = "";
       this._imodelName = "";
       this._snapshotName = filenames[0];
@@ -261,7 +261,7 @@ export default class App extends React.Component<{}, AppState> {
 
   private _handleOpenSnapshot = async () => {
 
-    if (!this._snapshotName || this._snapshotName.length === 0)
+    if (!this._snapshotName)
       this._snapshotName = this.getDefaultSnapshot();
 
     let imodel: IModelConnection | undefined;
@@ -280,7 +280,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   private _handleOpenImodel = async () => {
-    if (!this._projectName || !this._projectName.length || !this._imodelName || !this._imodelName.length) {
+    if (!this._projectName || !this._imodelName) {
       this.setState({ isOpening: false });
       return;
     }
@@ -297,7 +297,7 @@ export default class App extends React.Component<{}, AppState> {
     const imodelQuery = new IModelQuery();
     imodelQuery.byName(this._imodelName);
     const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
-    if (imodels.length === 0) {
+    if (!imodels) {
       this.setState({ isOpening: false });
       throw new Error(IModelApp.i18n.translate("SampleApp:noIModel", {imodelName: this._imodelName, projectName: this._projectName}));
     }
