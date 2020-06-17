@@ -20,8 +20,8 @@ export class AppUi {
     FrontstageManager.addFrontstageProvider(new IModelSelectFrontstage());
   }
 
-  /** Handle when an iModel and the views have been selected  */
-  public static handleIModelViewsSelected = async (iModelConnection: IModelConnection, viewState: ViewState) => {
+  /** Handle when an iModel and the view has been selected  */
+  public static handleIModelViewSelected = async (iModelConnection: IModelConnection, viewState: ViewState) => {
     // Set the iModelConnection in the Redux store
     UiFramework.setIModelConnection(iModelConnection);
     UiFramework.setDefaultViewState(viewState);
@@ -29,7 +29,7 @@ export class AppUi {
     // Tell the SyncUiEventDispatcher about the iModelConnection
     SyncUiEventDispatcher.initializeConnectionEvents(iModelConnection);
 
-    // We create a FrontStage that contains the views that we want.
+    // We create a FrontStage that contains the view that we want.
     const frontstageProvider: FrontstageProvider = new SampleFrontstage(viewState) as FrontstageProvider;
     FrontstageManager.addFrontstageProvider(frontstageProvider);
 

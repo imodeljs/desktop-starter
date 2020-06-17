@@ -12,6 +12,7 @@ import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IM
 import { SignIn } from "@bentley/ui-components";
 import { ConfigurableUiContent, FrontstageManager, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
 import { UiItemsManager } from "@bentley/ui-abstract";
+import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import { AppUi } from "../app-ui/AppUi";
 import { AppBackstageItemProvider } from "../app-ui/backstage/AppBackstageItemProvider";
 import { AppBackstageComposer } from "../app-ui/backstage/AppBackstageComposer";
@@ -178,13 +179,23 @@ export default class App extends React.Component<{}, AppState> {
       // attempt to get ViewState for the first available view definition
       const viewState = await this.getFirstViewDefinition(imodel);
       if (viewState) {
-        await AppUi.handleIModelViewsSelected(imodel, viewState);
+        await AppUi.handleIModelViewSelected(imodel, viewState);
       }
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
       alert(e.message);
     }
+  }
+
+  private _renderOpening() {
+    return (
+      <Dialog opened={true} modal={true} hideHeader={true} width={300}>
+        <span style={{margin: "10px"}}>
+          <LoadingSpinner size={SpinnerSize.Large} message={IModelApp.i18n.translate("SampleApp:opening")} />
+        </span>
+      </Dialog>
+    );
   }
 
   /** The component's render method */
@@ -196,9 +207,6 @@ export default class App extends React.Component<{}, AppState> {
       ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:signing-in")}...</span>;
     } else if (!this.state.user.isAuthorized && !this._wantSnapshot) {
       ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
-    } else if (this.state.isOpening) {
-      // if iModel is currently being opened, just show that
-      ui = <span style={{ marginLeft: "8px", marginTop: "8px" }}>{IModelApp.i18n.translate("SampleApp:opening")}...</span>;
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents/>;
@@ -209,6 +217,7 @@ export default class App extends React.Component<{}, AppState> {
       <Provider store={SampleApp.store} >
         <div className="App">
           {ui}
+          {this.state.isOpening && this._renderOpening()}
         </div>
       </Provider>
     );
@@ -236,7 +245,7 @@ export default class App extends React.Component<{}, AppState> {
         await currentIModelConnection.close();
         UiFramework.setIModelConnection(undefined);
       }
-      await this._handleOpenSnapshot();
+      await this._handleOpen();
     }
   }
 

@@ -4,10 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
 import { ViewState } from "@bentley/imodeljs-frontend";
+import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
-  BackstageManager, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef, Frontstage,
-  FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl,
-  ItemList, StagePanel, SyncUiEventId, ToolbarHelper, ToolWidget, UiFramework, Widget, WidgetState, Zone, ZoneState,
+  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
+  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, SyncUiEventId, ToolbarComposer,
+  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 
@@ -52,14 +53,14 @@ export class SampleFrontstage extends FrontstageProvider {
         defaultTool={CoreTools.selectElementCommand} defaultLayout={this._contentLayoutDef} contentGroup={this._contentGroup}
         isInFooterMode={true}
 
-        topLeft={
+        contentManipulationTools={
           <Zone
             widgets={[
               <Widget isFreeform={true} element={<SampleToolWidget />} />,
             ]}
           />
         }
-        topRight={
+        viewNavigationTools={
           <Zone
             widgets={[
               /** Use standard NavigationWidget delivered in ui-framework */
@@ -81,11 +82,6 @@ export class SampleFrontstage extends FrontstageProvider {
             ]}
           />
         }
-        rightPanel={
-          <StagePanel
-            allowedZones={[6, 9]}
-          />
-        }
       />
     );
   }
@@ -104,7 +100,7 @@ export class SampleFrontstage extends FrontstageProvider {
       customId: "sampleApp:viewSelector",
       reactElement: (
         <IModelConnectedViewSelector
-          listenForShowUpdates={false}  // Demo for showing only the same type of view in ViewSelector - See IModelViewport.tsx, onActivated
+          listenForShowUpdates={false}
         />
       ),
     });
@@ -115,18 +111,31 @@ export class SampleFrontstage extends FrontstageProvider {
 /**
  * Define a ToolWidget with Buttons to display in the TopLeft zone.
  */
-class SampleToolWidget extends React.Component {
+export function SampleToolWidget() {
 
-  public render(): React.ReactNode {
-    const horizontalItems = new ItemList([
-      CoreTools.selectElementCommand,
-    ]);
+  const getVerticalToolbarItems = React.useCallback(
+    (): CommonToolbarItem[] => {
+      const items: CommonToolbarItem[] = [];
+      items.push(
+        ToolbarHelper.createToolbarItemFromItemDef(10, CoreTools.selectElementCommand),
+      );
+      return items;
+    }, []);
 
-    return (
-      <ToolWidget
-        appButton={BackstageManager.getBackstageToggleCommand()}
-        horizontalItems={horizontalItems}
+  const [verticalItems, setVerticalItems] = React.useState(() => getVerticalToolbarItems());
+
+  const isInitialMount = React.useRef(true);
+  React.useEffect(() => {
+    if (isInitialMount.current)
+      isInitialMount.current = false;
+    else
+      setVerticalItems(getVerticalToolbarItems());
+  }, [getVerticalToolbarItems]);
+
+  return (
+    <ToolWidgetComposer
+      cornerItem={<BackstageAppButton/>}
+      verticalToolbar={<ToolbarComposer items={verticalItems} usage={ToolbarUsage.ContentManipulation} orientation={ToolbarOrientation.Vertical} />}
       />
-    );
-  }
+  );
 }
