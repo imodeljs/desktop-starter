@@ -1,6 +1,6 @@
 {
-  "name": "sample-app",
-  "description": "Sample App",
+  "name": "desktop-starter",
+  "description": "Desktop Starter",
   "license": "MIT",
   "author": {
     "name": "Bentley Systems, Inc.",
@@ -14,7 +14,7 @@
   "engines": {
     "node": ">=10.16.0 <13.0"
   },
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "npm run pseudolocalize && npm run build:backend && cross-env USE_FAST_SASS=true npm run build:frontend && npm run copy",

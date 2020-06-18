@@ -5,6 +5,6 @@
 
 /** List of LoggerCategories for this app.  For more details on Logging Categories, check out the [Category](https://www.imodeljs.org/learning/common/logging/#categories) documentation. */
 export enum AppLoggerCategory {
-  Frontend = "sample-app.Frontend",
-  Backend = "sample-app.Backend",
+  Frontend = "app.Frontend",
+  Backend = "app.Backend",
 }

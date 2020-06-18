@@ -4,30 +4,24 @@
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
-
 import { AppLoggerCategory } from "../common/LoggerCategory";
-import { SampleApp } from "./app/SampleApp";
-import { AppUi } from "./app-ui/AppUi";
-import App from "./components/App";
+import { App } from "./app/App";
+import AppComponent from "./components/AppComponent";
 import "./index.scss";
 
-// Setup logging immediately to pick up any logging during SampleApp.startup()
+// Setup logging immediately to pick up any logging during App.startup()
 Logger.initializeToConsole();
 Logger.setLevelDefault(LogLevel.Warning);
 Logger.setLevel(AppLoggerCategory.Frontend, LogLevel.Info);
 
 (async () => {
   // Start the app.
-  await SampleApp.startup();
-
-  // Initialize the AppUi & ConfigurableUiManager
-  AppUi.initialize();
+  await App.startup();
 
   // when initialization is complete, render
   ReactDOM.render(
-    <App />,
+    <AppComponent />,
     document.getElementById("root") as HTMLElement,
   );
 })(); // tslint:disable-line:no-floating-promises

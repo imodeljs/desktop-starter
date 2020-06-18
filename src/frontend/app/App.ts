@@ -8,12 +8,13 @@ import { DesktopAuthorizationClientConfiguration, ElectronRpcManager } from "@be
 import { DesktopAuthorizationClient, IModelApp, IModelAppOptions } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { AppNotificationManager, UiFramework } from "@bentley/ui-framework";
+import { AppNotificationManager, ConfigurableUiManager,  FrontstageManager, UiFramework } from "@bentley/ui-framework";
 import { AppState, AppStore } from "./AppState";
+import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
 
 import { getSupportedRpcs } from "../../common/rpcs";
 
-export class SampleApp {
+export class App {
   private static _appState: AppState;
 
   public static get oidcClient(): FrontendAuthorizationClient { return IModelApp.authorizationClient as FrontendAuthorizationClient; }
@@ -29,7 +30,7 @@ export class SampleApp {
     await IModelApp.startup(opts);
 
     // initialize OIDC
-    await SampleApp.initializeOidc();
+    await App.initializeOidc();
 
     // initialize Presentation
     await Presentation.initialize({activeLocale: IModelApp.i18n.languageList()[0]});
@@ -38,7 +39,7 @@ export class SampleApp {
     ElectronRpcManager.initializeClient({}, getSupportedRpcs());
 
     // initialize localization for the app
-    await IModelApp.i18n.registerNamespace("SampleApp").readFinished;
+    await IModelApp.i18n.registerNamespace("App").readFinished;
 
     // create the application state store for Redux
     this._appState = new AppState();
@@ -48,6 +49,12 @@ export class SampleApp {
 
     // initialize IModelSelect
     await IModelSelect.initialize(IModelApp.i18n);
+
+    // initialize the ConfigurableUiManager
+    ConfigurableUiManager.initialize();
+
+    // Create a FrontStage where we can select a project/iModel.
+    FrontstageManager.addFrontstageProvider(new IModelSelectFrontstage());
   }
 
   public static async initializeOidc() {

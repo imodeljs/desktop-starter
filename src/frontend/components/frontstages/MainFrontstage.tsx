@@ -7,15 +7,14 @@ import { ViewState } from "@bentley/imodeljs-frontend";
 import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
   BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
-  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, SyncUiEventId, ToolbarComposer,
-  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone, ZoneState,
+  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, ToolbarComposer,
+  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone,
 } from "@bentley/ui-framework";
-import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 
 /**
- * Sample Frontstage
+ * Main Frontstage
  */
-export class SampleFrontstage extends FrontstageProvider {
+export class MainFrontstage extends FrontstageProvider {
 
   // Content layout for content views
   private _contentLayoutDef: ContentLayoutDef;
@@ -49,14 +48,14 @@ export class SampleFrontstage extends FrontstageProvider {
   public get frontstage() {
 
     return (
-      <Frontstage id="SampleFrontstage"
+      <Frontstage id="MainFrontstage"
         defaultTool={CoreTools.selectElementCommand} defaultLayout={this._contentLayoutDef} contentGroup={this._contentGroup}
         isInFooterMode={true}
 
         contentManipulationTools={
           <Zone
             widgets={[
-              <Widget isFreeform={true} element={<SampleToolWidget />} />,
+              <Widget isFreeform={true} element={<TopLeftToolWidget />} />,
             ]}
           />
         }
@@ -65,20 +64,6 @@ export class SampleFrontstage extends FrontstageProvider {
             widgets={[
               /** Use standard NavigationWidget delivered in ui-framework */
               <Widget isFreeform={true} element={<BasicNavigationWidget additionalVerticalItems={this._additionalNavigationVerticalToolbarItems} />} />,
-            ]}
-          />
-        }
-        bottomRight={
-          <Zone defaultState={ZoneState.Open} allowsMerging={true}
-            widgets={[
-              <Widget id="Properties" control={PropertyGridWidget} defaultState={WidgetState.Closed} fillZone={true}
-                iconSpec="icon-properties-list" labelKey="SampleApp:components.properties"
-                applicationData={{
-                  iModelConnection: UiFramework.getIModelConnection(),
-                }}
-                syncEventIds={[SyncUiEventId.SelectionSetChanged]}
-                stateFunc={this._determineWidgetStateForSelectionSet}
-              />,
             ]}
           />
         }
@@ -97,7 +82,7 @@ export class SampleFrontstage extends FrontstageProvider {
   /** Get the CustomItemDef for ViewSelector  */
   private get _viewSelectorItemDef() {
     return new CustomItemDef({
-      customId: "sampleApp:viewSelector",
+      customId: "App:viewSelector",
       reactElement: (
         <IModelConnectedViewSelector
           listenForShowUpdates={false}
@@ -111,7 +96,7 @@ export class SampleFrontstage extends FrontstageProvider {
 /**
  * Define a ToolWidget with Buttons to display in the TopLeft zone.
  */
-export function SampleToolWidget() {
+export function TopLeftToolWidget() {
 
   const getVerticalToolbarItems = React.useCallback(
     (): CommonToolbarItem[] => {

@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
-import { SampleApp } from "../../app/SampleApp";
+import { App } from "../../app/App";
 import { ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
   FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, UiFramework,
 } from "@bentley/ui-framework";
@@ -25,7 +25,7 @@ class IModelSelectorControl extends ContentControl {
       UiFramework.setIModelConnection(undefined);
     }
 
-    SampleApp.store.dispatch({type: "App:OPEN_IT", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
+    App.store.dispatch({type: "App:OPEN_IT", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
   }
 }
 

@@ -67,7 +67,7 @@ export class AppState {
   private _rootReducer: any;
 
   constructor() {
-    // this is the rootReducer for the sample application.
+    // this is the rootReducer for the application.
     this._rootReducer = combineReducers<RootState>({
       switchIModelState: AppReducer,
       frameworkState: FrameworkReducer,
