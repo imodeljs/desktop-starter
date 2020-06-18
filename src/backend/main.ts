@@ -56,7 +56,6 @@ async function initialize(rpcs: RpcInterfaceDefinition[]) {
 
     // get RPCs supported by this backend
     const rpcs = getSupportedRpcs();
-    // do initialize
     await initialize(rpcs);
 
   } catch (error) {

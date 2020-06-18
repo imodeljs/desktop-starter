@@ -18,9 +18,9 @@ See http://imodeljs.org for comprehensive documentation on the iModel.js API and
 
 2. Start the app:
 
-      ```sh
-      npm start
-      ```
+    ```sh
+    npm start
+    ```
 
 ## Advanced configuration options
 
