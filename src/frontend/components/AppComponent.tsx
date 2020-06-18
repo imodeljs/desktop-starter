@@ -252,7 +252,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     // render the app
     return (
       <Provider store={App.store} >
-        <div className="App">
+        <div className="AppComponent">
           {ui}
           {this.state.user.isLoading && this._renderSpinner(IModelApp.i18n.translate("App:signing-in"))}
           {this.state.isOpening && this._renderSpinner(IModelApp.i18n.translate("App:opening"))}
