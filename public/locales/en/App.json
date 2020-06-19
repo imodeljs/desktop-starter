@@ -1,0 +1,15 @@
+{
+  "signing-in": "Signing-in",
+  "opening": "Opening",
+  "noViewDefinition": "No valid view definitions in iModel",
+  "errorOpenSnapshot": "Error opening snapshot: {{snapshotName}} -- {{e}}",
+  "noIModel": "iModel with name {{imodelName}} does not exist in project {{projectName}}",
+  "noProject": "Project with name {{projectName}} does not exist",
+  "components": {
+    "properties": "Properties"
+  },
+  "backstage": {
+    "selectIModel": "Select iModel",
+    "selectSnapshot": "Select Snapshot"
+  }
+}
