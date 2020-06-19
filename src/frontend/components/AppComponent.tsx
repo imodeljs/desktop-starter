@@ -8,9 +8,9 @@ import { Provider } from "react-redux";
 import { Config, OpenMode } from "@bentley/bentleyjs-core";
 import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
 import { IModelQuery } from "@bentley/imodelhub-client";
-import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
+import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
+import { ConfigurableUiContent, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
 import { UiItemsManager } from "@bentley/ui-abstract";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import { AppBackstageItemProvider } from "./backstage/AppBackstageItemProvider";
@@ -42,6 +42,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   private _subscription: any;
   private _autoOpenConfig: AutoOpenConfig;
   private _isAutoOpen: boolean;         // auto-opening iModel?
+  private _wantSnapshot: boolean;
 
   private get snapshotName(): string | null { return this._autoOpenConfig.snapshotName; }
   private set snapshotName(value: string | null) { this._autoOpenConfig.snapshotName = value; }
@@ -51,8 +52,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   private get imodelName(): string | null { return this._autoOpenConfig.imodelName; }
   private set imodelName(value: string | null) { this._autoOpenConfig.imodelName = value; }
-
-  private get wantSnapshot(): boolean { return !this._autoOpenConfig.snapshotName !== true; }
 
   /** Creates an App instance */
   constructor(props?: any, context?: any) {
@@ -68,6 +67,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     this._autoOpenConfig = {snapshotName: null, projectName: null, imodelName: null};
     this._isAutoOpen = true;
+    this._wantSnapshot = true;
 
     this.initializeAutoOpen();
     this.addSwitchStateSubscription();
@@ -96,18 +96,21 @@ export default class AppComponent extends React.Component<{}, AppState> {
         }
       }
     }
+    this._wantSnapshot = !this._autoOpenConfig.snapshotName !== true;
   }
 
   private addSwitchStateSubscription() {
     this._subscription = App.store.subscribe(async () => {
       const switchState = App.store.getState().switchIModelState!.switchState;
       if (switchState === SwitchState.SelectIModel) {
+        this._wantSnapshot = false;
         // Trigger sign-in if not authorized yet
         if (!this.state.user.isAuthorized)
           this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
         const frontstageDef = FrontstageManager.findFrontstageDef("IModelSelector");
         await FrontstageManager.setActiveFrontstageDef(frontstageDef);
       } else if (switchState === SwitchState.SelectSnapshot) {
+        this._wantSnapshot = true;
         await this._handleSelectSnapshot();
       } else if (switchState === SwitchState.OpenIt) {
         const selectedIModel = App.store.getState().switchIModelState.selectedIModel;
@@ -115,6 +118,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
           this.projectName = selectedIModel.projectName;
           this.imodelName = selectedIModel.imodelName;
           this.snapshotName = null;
+          this._wantSnapshot = false;
           await this._handleOpen();
         }
       }
@@ -149,7 +153,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   public componentDidMount() {
     App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
     // Make sure user is signed in before attempting to open an iModel
-    if (!this.wantSnapshot && !this.state.user.isAuthorized)
+    if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
     else {
       // tslint:disable-next-line: no-floating-promises
@@ -181,7 +185,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
-  private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState> {
+  private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
     const viewSpecs = await imodel.views.queryProps({});
     const acceptedViewClasses = [
       "BisCore:SpatialViewDefinition",
@@ -189,8 +193,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
       "BisCore:OrthographicViewDefinition",
     ];
     const acceptedViewSpecs = viewSpecs.filter((spec) => (-1 !== acceptedViewClasses.indexOf(spec.classFullName)));
-    if (!acceptedViewSpecs)
-      throw new Error(IModelApp.i18n.translate("App:noViewDefinition"));
+    if (!acceptedViewSpecs) {
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noViewDefinition"), undefined, OutputMessageType.Alert));
+      return null;
+    }
 
     return imodel.views.load(acceptedViewSpecs[0].id!);
   }
@@ -221,12 +227,24 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
         // Cache name of snapshot or imodel/project that was opened for auto-open in next session
         this.saveAutoOpenConfig();
+      } else {
+        // If we failed to find a viewState, then we will just close the imodel and allow the user to select a different shapshot/iModel
+        await imodel.close();
+        this.doReselectOnError();
       }
     } catch (e) {
       // if failed, close the imodel and reset the state
       await imodel.close();
       alert(e.message);
+      this.doReselectOnError();
     }
+  }
+
+  private doReselectOnError() {
+    if (this._wantSnapshot)
+      App.store.dispatch({ type: "App:SELECT_SNAPSHOT"});
+    else
+      App.store.dispatch({ type: "App:SELECT_IMODEL"});
   }
 
   private _renderSpinner(msg: string) {
@@ -243,7 +261,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   public render() {
     let ui: React.ReactNode;
 
-    if (!this.state.user.isAuthorized && !this.wantSnapshot) {
+    if (!this.state.user.isAuthorized && !this._wantSnapshot) {
       ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
@@ -292,7 +310,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._isAutoOpen = false;
     this.setState({ isOpening: true});
 
-    if (this.wantSnapshot)
+    if (this._wantSnapshot)
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
@@ -308,11 +326,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
       // attempt to open the imodel
       imodel = await SnapshotConnection.openFile(this.snapshotName);
     } catch (e) {
-      const errMsg = IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this.snapshotName, e});
-      const con = this.getRemote().getGlobal("console");
-      con.log(errMsg);
-      window.close();
-      process.exit(0);
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this.snapshotName, e}), undefined, OutputMessageType.Alert));
+      this.doReselectOnError();
+      return;
     }
 
     await this._onIModelOpened(imodel);
@@ -330,7 +346,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
       project = await connectClient.getProject(requestContext, { $filter: `Name+eq+'${this.projectName}'` });
     } catch (e) {
       this.setState({ isOpening: false });
-      throw new Error(IModelApp.i18n.translate("App:noProject", {projectName: this.projectName}));
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noProject", {projectName: this.projectName}), undefined, OutputMessageType.Alert));
+      this.doReselectOnError();
+      return;
     }
 
     const imodelQuery = new IModelQuery();
@@ -338,7 +356,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
     if (!imodels) {
       this.setState({ isOpening: false });
-      throw new Error(IModelApp.i18n.translate("App:noIModel", {imodelName: this.imodelName, projectName: this.projectName}));
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noIModel", {imodelName: this.imodelName, projectName: this.projectName}), undefined, OutputMessageType.Alert));
+      this.doReselectOnError();
+      return;
     }
 
     let imodel: IModelConnection | undefined;
