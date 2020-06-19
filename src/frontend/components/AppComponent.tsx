@@ -91,8 +91,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
         this.loadAutoOpenConfig();
 
         // If nothing was configured, then open the default snapshot
-        if (!this.snapshotName || !this.projectName || !this.imodelName) {
-          this.snapshotName = this.getDefaultSnapshot();
+        if (!this.projectName || !this.imodelName) {
+          if (!this.snapshotName)
+            this.snapshotName = this.getDefaultSnapshot();
         }
       }
     }
@@ -339,6 +340,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
       this.setState({ isOpening: false });
       return;
     }
+    this.snapshotName = null;
+
     const requestContext: AuthorizedFrontendRequestContext = await AuthorizedFrontendRequestContext.create();
     const connectClient = new ContextRegistryClient();
     let project: Project;
