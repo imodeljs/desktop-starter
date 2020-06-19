@@ -6,9 +6,9 @@ import * as React from "react";
 import { ViewState } from "@bentley/imodeljs-frontend";
 import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
-  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
+  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, CoreTools, CustomItemDef,
   Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, ToolbarComposer,
-  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone,
+  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, Zone,
 } from "@bentley/ui-framework";
 
 /**
@@ -69,14 +69,6 @@ export class MainFrontstage extends FrontstageProvider {
         }
       />
     );
-  }
-
-  /** Determine the WidgetState based on the Selection Set */
-  private _determineWidgetStateForSelectionSet = (): WidgetState => {
-    const activeContentControl = ContentViewManager.getActiveContentControl();
-    if (activeContentControl && activeContentControl.viewport && (activeContentControl.viewport.view.iModel.selectionSet.size > 0))
-      return WidgetState.Open;
-    return WidgetState.Closed;
   }
 
   /** Get the CustomItemDef for ViewSelector  */

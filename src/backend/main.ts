@@ -10,7 +10,6 @@ import { Presentation } from "@bentley/presentation-backend";
 import { ElectronRpcManager, RpcInterfaceDefinition } from "@bentley/imodeljs-common";
 import { getSupportedRpcs } from "../common/rpcs";
 import { AppLoggerCategory } from "../common/LoggerCategory";
-import {app} from "electron";
 
 // Setup logging immediately to pick up any logging during IModelHost.startup()
 Logger.initializeToConsole();
