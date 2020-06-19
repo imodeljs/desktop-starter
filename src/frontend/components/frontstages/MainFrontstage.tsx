@@ -72,7 +72,7 @@ export class MainFrontstage extends FrontstageProvider {
           <Zone defaultState={ZoneState.Open} allowsMerging={true}
             widgets={[
               <Widget id="Properties" control={PropertyGridWidget} defaultState={WidgetState.Closed} fillZone={true}
-                iconSpec="icon-properties-list" labelKey="SampleApp:components.properties"
+                iconSpec="icon-properties-list" labelKey="App:components.properties"
                 applicationData={{
                   iModelConnection: UiFramework.getIModelConnection(),
                 }}
