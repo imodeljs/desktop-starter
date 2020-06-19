@@ -114,6 +114,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         if (selectedIModel) {
           this.projectName = selectedIModel.projectName;
           this.imodelName = selectedIModel.imodelName;
+          this.snapshotName = null;
           await this._handleOpen();
         }
       }

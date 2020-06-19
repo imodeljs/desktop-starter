@@ -6,10 +6,11 @@ import * as React from "react";
 import { ViewState } from "@bentley/imodeljs-frontend";
 import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
-  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, CoreTools, CustomItemDef,
-  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, ToolbarComposer,
-  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, Zone,
+  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
+  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, SyncUiEventId, ToolbarComposer,
+  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
+import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 
 /**
  * Main Frontstage
@@ -67,8 +68,30 @@ export class MainFrontstage extends FrontstageProvider {
             ]}
           />
         }
+        bottomRight={
+          <Zone defaultState={ZoneState.Open} allowsMerging={true}
+            widgets={[
+              <Widget id="Properties" control={PropertyGridWidget} defaultState={WidgetState.Closed} fillZone={true}
+                iconSpec="icon-properties-list" labelKey="SampleApp:components.properties"
+                applicationData={{
+                  iModelConnection: UiFramework.getIModelConnection(),
+                }}
+                syncEventIds={[SyncUiEventId.SelectionSetChanged]}
+                stateFunc={this._determineWidgetStateForSelectionSet}
+              />,
+            ]}
+          />
+        }
       />
     );
+  }
+
+  /** Determine the WidgetState based on the Selection Set */
+  private _determineWidgetStateForSelectionSet = (): WidgetState => {
+    const activeContentControl = ContentViewManager.getActiveContentControl();
+    if (activeContentControl && activeContentControl.viewport && (activeContentControl.viewport.view.iModel.selectionSet.size > 0))
+      return WidgetState.Open;
+    return WidgetState.Closed;
   }
 
   /** Get the CustomItemDef for ViewSelector  */
