@@ -3,12 +3,11 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-import { ViewState } from "@bentley/imodeljs-frontend";
 import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
   BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
-  Frontstage, FrontstageProvider, IModelConnectedViewSelector, IModelViewportControl, SyncUiEventId, ToolbarComposer,
-  ToolbarHelper, ToolWidgetComposer, UiFramework, Widget, WidgetState, Zone, ZoneState,
+  Frontstage, FrontstageProvider, IModelViewportControl, SyncUiEventId, ToolbarComposer,
+  ToolbarHelper, ToolWidgetComposer, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 
@@ -23,7 +22,7 @@ export class MainFrontstage extends FrontstageProvider {
   // Content group for both layouts
   private _contentGroup: ContentGroup;
 
-  constructor(public viewState: ViewState) {
+  constructor() {
     super();
 
     this._contentLayoutDef = new ContentLayoutDef({});
@@ -32,7 +31,7 @@ export class MainFrontstage extends FrontstageProvider {
         {
           classId: IModelViewportControl,
           applicationData: {
-            viewState: this.viewState,
+            viewState: UiFramework.getDefaultViewState(),
             iModelConnection: UiFramework.getIModelConnection(),
           },
         },
@@ -96,16 +95,14 @@ export class MainFrontstage extends FrontstageProvider {
 
   /** Get the CustomItemDef for ViewSelector  */
   private get _viewSelectorItemDef() {
+    const imodelConnection = UiFramework.getIModelConnection();
     return new CustomItemDef({
       customId: "App:viewSelector",
       reactElement: (
-        <IModelConnectedViewSelector
-          listenForShowUpdates={false}
-        />
+        <ViewSelector imodel={imodelConnection} listenForShowUpdates={false} />
       ),
     });
   }
-
 }
 
 /**
@@ -134,8 +131,8 @@ export function TopLeftToolWidget() {
 
   return (
     <ToolWidgetComposer
-      cornerItem={<BackstageAppButton/>}
+      cornerItem={<BackstageAppButton />}
       verticalToolbar={<ToolbarComposer items={verticalItems} usage={ToolbarUsage.ContentManipulation} orientation={ToolbarOrientation.Vertical} />}
-      />
+    />
   );
 }

@@ -10,7 +10,7 @@ import { ContextRegistryClient, Project } from "@bentley/context-registry-client
 import { IModelQuery } from "@bentley/imodelhub-client";
 import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
+import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection } from "@bentley/ui-framework";
 import { UiItemsManager } from "@bentley/ui-abstract";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import { AppBackstageItemProvider } from "./backstage/AppBackstageItemProvider";
@@ -65,7 +65,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       isOpening: false,
     };
 
-    this._autoOpenConfig = {snapshotName: null, projectName: null, imodelName: null};
+    this._autoOpenConfig = { snapshotName: null, projectName: null, imodelName: null };
     this._isAutoOpen = true;
     this._wantSnapshot = true;
 
@@ -77,14 +77,14 @@ export default class AppComponent extends React.Component<{}, AppState> {
     // If a snapshot is configured in .env.local, then use for auto-opening at startup
     try {
       this.snapshotName = Config.App.get("imjs_offline_imodel");
-    } catch (e) {}
+    } catch (e) { }
 
     // If no snapshot, check if a project/iModel is configured
     if (!this.snapshotName) {
       try {
         this.imodelName = Config.App.get("imjs_test_imodel");
         this.projectName = Config.App.get("imjs_test_project", this.imodelName as string);
-      } catch (e) {}
+      } catch (e) { }
 
       // Check if we cached a snapshot or project/iModel to reopen
       if (!this.projectName || !this.imodelName) {
@@ -217,12 +217,12 @@ export default class AppComponent extends React.Component<{}, AppState> {
         UiFramework.setIModelConnection(imodel);
         UiFramework.setDefaultViewState(viewState);
 
+        // We create a FrontStage that contains the view that we want.
+        const frontstageProvider: FrontstageProvider = new MainFrontstage() as FrontstageProvider;
+        FrontstageManager.addFrontstageProvider(frontstageProvider);
+
         // Tell the SyncUiEventDispatcher about the iModelConnection
         SyncUiEventDispatcher.initializeConnectionEvents(imodel);
-
-        // We create a FrontStage that contains the view that we want.
-        const frontstageProvider: FrontstageProvider = new MainFrontstage(viewState) as FrontstageProvider;
-        FrontstageManager.addFrontstageProvider(frontstageProvider);
 
         await FrontstageManager.setActiveFrontstageDef(frontstageProvider.frontstageDef);
 
@@ -243,15 +243,15 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   private doReselectOnError() {
     if (this._wantSnapshot)
-      App.store.dispatch({ type: "App:SELECT_SNAPSHOT"});
+      App.store.dispatch({ type: "App:SELECT_SNAPSHOT" });
     else
-      App.store.dispatch({ type: "App:SELECT_IMODEL"});
+      App.store.dispatch({ type: "App:SELECT_IMODEL" });
   }
 
   private _renderSpinner(msg: string) {
     return (
       <Dialog opened={true} modal={true} hideHeader={true} width={300}>
-        <span style={{margin: "10px"}}>
+        <span style={{ margin: "10px" }}>
           <LoadingSpinner size={SpinnerSize.Large} message={msg} />
         </span>
       </Dialog>
@@ -266,7 +266,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
-      ui = <IModelComponents/>;
+      ui = <IModelComponents />;
     }
 
     // render the app
@@ -291,7 +291,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     try {
       filenames = this.getRemote().dialog.showOpenDialogSync(options);
-    } catch (e) {}
+    } catch (e) { }
 
     if (filenames) {
       this.projectName = "";
@@ -309,7 +309,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   private _handleOpen = async () => {
     this._isAutoOpen = false;
-    this.setState({ isOpening: true});
+    this.setState({ isOpening: true });
 
     if (this._wantSnapshot)
       return this._handleOpenSnapshot();
@@ -327,7 +327,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       // attempt to open the imodel
       imodel = await SnapshotConnection.openFile(this.snapshotName);
     } catch (e) {
-      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this.snapshotName, e}), undefined, OutputMessageType.Alert));
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:errorOpenSnapshot", { snapshotName: this.snapshotName, e }), undefined, OutputMessageType.Alert));
       this.doReselectOnError();
       return;
     }
@@ -349,7 +349,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       project = await connectClient.getProject(requestContext, { $filter: `Name+eq+'${this.projectName}'` });
     } catch (e) {
       this.setState({ isOpening: false });
-      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noProject", {projectName: this.projectName}), undefined, OutputMessageType.Alert));
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noProject", { projectName: this.projectName }), undefined, OutputMessageType.Alert));
       this.doReselectOnError();
       return;
     }
@@ -359,7 +359,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
     if (!imodels) {
       this.setState({ isOpening: false });
-      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noIModel", {imodelName: this.imodelName, projectName: this.projectName}), undefined, OutputMessageType.Alert));
+      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noIModel", { imodelName: this.imodelName, projectName: this.projectName }), undefined, OutputMessageType.Alert));
       this.doReselectOnError();
       return;
     }
@@ -369,6 +369,12 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     await this._onIModelOpened(imodel);
   }
+}
+
+// since we are not closing the current stage to pick a new snapshow we must wrap components to force un-mounting and re-mounting the stage.
+function IModelWrapper({ children }: { children: React.ReactNode }) {
+  const activeImodel = useActiveIModelConnection();
+  return <React.Fragment key={activeImodel ? activeImodel.iModelId : "no-imodel"}>{children}</React.Fragment>
 }
 
 /** Renders a viewport and a property grid */
@@ -386,7 +392,15 @@ class IModelComponents extends React.PureComponent {
 
   public render() {
     return (
-      <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
+      <Provider store={App.store} >
+        <ToolbarDragInteractionContext.Provider value={false}>
+          <FrameworkVersion version={"1"}>
+            <IModelWrapper>
+              <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
+            </IModelWrapper>
+          </FrameworkVersion>
+        </ToolbarDragInteractionContext.Provider>
+      </Provider >
     );
   }
 }
