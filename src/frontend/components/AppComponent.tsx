@@ -7,8 +7,9 @@ import * as path from "path";
 import { Provider } from "react-redux";
 import { Config, OpenMode } from "@bentley/bentleyjs-core";
 import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
-import { IModelQuery } from "@bentley/imodelhub-client";
-import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
+import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
+import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
+  NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
 import { ConfigurableUiContent, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, UiFramework } from "@bentley/ui-framework";
 import { UiItemsManager } from "@bentley/ui-abstract";
@@ -194,8 +195,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
       "BisCore:OrthographicViewDefinition",
     ];
     const acceptedViewSpecs = viewSpecs.filter((spec) => (-1 !== acceptedViewClasses.indexOf(spec.classFullName)));
-    if (!acceptedViewSpecs) {
-      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noViewDefinition"), undefined, OutputMessageType.Alert));
+    if (!acceptedViewSpecs.length) {
+      await IModelApp.notifications.openMessageBox(MessageBoxType.Ok, IModelApp.i18n.translate("App:noViewDefinition", undefined), MessageBoxIconType.Information);
       return null;
     }
 
@@ -327,7 +328,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
       // attempt to open the imodel
       imodel = await SnapshotConnection.openFile(this.snapshotName);
     } catch (e) {
-      MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this.snapshotName, e}), undefined, OutputMessageType.Alert));
+      this.setState({ isOpening: false });
+      await IModelApp.notifications.openMessageBox(MessageBoxType.Ok, IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this.snapshotName, e}), MessageBoxIconType.Critical);
       this.doReselectOnError();
       return;
     }
@@ -344,10 +346,13 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     const requestContext: AuthorizedFrontendRequestContext = await AuthorizedFrontendRequestContext.create();
     const connectClient = new ContextRegistryClient();
-    let project: Project;
+    let project: Project | undefined;
     try {
       project = await connectClient.getProject(requestContext, { $filter: `Name+eq+'${this.projectName}'` });
     } catch (e) {
+      project = undefined;
+    }
+    if (!project) {
       this.setState({ isOpening: false });
       MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noProject", {projectName: this.projectName}), undefined, OutputMessageType.Alert));
       this.doReselectOnError();
@@ -356,8 +361,13 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     const imodelQuery = new IModelQuery();
     imodelQuery.byName(this.imodelName);
-    const imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
-    if (!imodels) {
+    let imodels: HubIModel[] | undefined;
+    try {
+      imodels = await IModelApp.iModelClient.iModels.get(requestContext, project.wsgId, imodelQuery);
+    } catch (e) {
+      imodels = undefined;
+    }
+    if (!imodels || !imodels.length) {
       this.setState({ isOpening: false });
       MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noIModel", {imodelName: this.imodelName, projectName: this.projectName}), undefined, OutputMessageType.Alert));
       this.doReselectOnError();
