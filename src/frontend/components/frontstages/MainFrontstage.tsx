@@ -3,13 +3,14 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
+// import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
-  BackstageAppButton, BasicNavigationWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools, CustomItemDef,
-  Frontstage, FrontstageProvider, IModelViewportControl, SyncUiEventId, ToolbarComposer,
-  ToolbarHelper, ToolWidgetComposer, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
+  BasicNavigationWidget, BasicToolWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools,
+  CustomItemDef, Frontstage, FrontstageProvider, IModelViewportControl,
+  SyncUiEventId, ToolbarHelper, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
+import { AppStatusBarWidget } from "../widgets/statusbar/AppStatusBar";
 
 /**
  * Main Frontstage
@@ -33,6 +34,7 @@ export class MainFrontstage extends FrontstageProvider {
           applicationData: {
             viewState: UiFramework.getDefaultViewState(),
             iModelConnection: UiFramework.getIModelConnection(),
+            disableDefaultViewOverlay: true,
           },
         },
       ],
@@ -55,7 +57,7 @@ export class MainFrontstage extends FrontstageProvider {
         contentManipulationTools={
           <Zone
             widgets={[
-              <Widget isFreeform={true} element={<TopLeftToolWidget />} />,
+              <Widget isFreeform={true} element={<BasicToolWidget showCategoryAndModelsContextTools={false} />} />,
             ]}
           />
         }
@@ -65,6 +67,14 @@ export class MainFrontstage extends FrontstageProvider {
               /** Use standard NavigationWidget delivered in ui-framework */
               <Widget isFreeform={true} element={<BasicNavigationWidget additionalVerticalItems={this._additionalNavigationVerticalToolbarItems} />} />,
             ]}
+          />
+        }
+        statusBar={
+          < Zone
+            widgets={
+              [
+                <Widget isStatusBar={true} control={AppStatusBarWidget} />,
+              ]}
           />
         }
         bottomRight={
@@ -105,34 +115,34 @@ export class MainFrontstage extends FrontstageProvider {
   }
 }
 
-/**
- * Define a ToolWidget with Buttons to display in the TopLeft zone.
- */
-export function TopLeftToolWidget() {
-
-  const getVerticalToolbarItems = React.useCallback(
-    (): CommonToolbarItem[] => {
-      const items: CommonToolbarItem[] = [];
-      items.push(
-        ToolbarHelper.createToolbarItemFromItemDef(10, CoreTools.selectElementCommand),
-      );
-      return items;
-    }, []);
-
-  const [verticalItems, setVerticalItems] = React.useState(() => getVerticalToolbarItems());
-
-  const isInitialMount = React.useRef(true);
-  React.useEffect(() => {
-    if (isInitialMount.current)
-      isInitialMount.current = false;
-    else
-      setVerticalItems(getVerticalToolbarItems());
-  }, [getVerticalToolbarItems]);
-
-  return (
-    <ToolWidgetComposer
-      cornerItem={<BackstageAppButton />}
-      verticalToolbar={<ToolbarComposer items={verticalItems} usage={ToolbarUsage.ContentManipulation} orientation={ToolbarOrientation.Vertical} />}
-    />
-  );
-}
+// /**
+//  * Define a ToolWidget with Buttons to display in the TopLeft zone.
+//  */
+// export function TopLeftToolWidget() {
+//
+//   const getVerticalToolbarItems = React.useCallback(
+//     (): CommonToolbarItem[] => {
+//       const items: CommonToolbarItem[] = [];
+//       items.push(
+//         ToolbarHelper.createToolbarItemFromItemDef(10, CoreTools.selectElementCommand),
+//       );
+//       return items;
+//     }, []);
+//
+//   const [verticalItems, setVerticalItems] = React.useState(() => getVerticalToolbarItems());
+//
+//   const isInitialMount = React.useRef(true);
+//   React.useEffect(() => {
+//     if (isInitialMount.current)
+//       isInitialMount.current = false;
+//     else
+//       setVerticalItems(getVerticalToolbarItems());
+//   }, [getVerticalToolbarItems]);
+//
+//   return (
+//     <ToolWidgetComposer
+//       cornerItem={<BackstageAppButton />}
+//       verticalToolbar={<ToolbarComposer items={verticalItems} usage={ToolbarUsage.ContentManipulation} orientation={ToolbarOrientation.Vertical} />}
+//     />
+//   );
+// }

@@ -10,10 +10,8 @@ import { ContextRegistryClient, Project } from "@bentley/context-registry-client
 import { IModelQuery } from "@bentley/imodelhub-client";
 import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection } from "@bentley/ui-framework";
-import { UiItemsManager } from "@bentley/ui-abstract";
+import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection, ThemeManager } from "@bentley/ui-framework";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
-import { AppBackstageItemProvider } from "./backstage/AppBackstageItemProvider";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 import { App } from "../app/App";
 import { SwitchState } from "../app/AppState";
@@ -379,27 +377,18 @@ function IModelWrapper({ children }: { children: React.ReactNode }) {
 
 /** Renders a viewport and a property grid */
 class IModelComponents extends React.PureComponent {
-
-  private _provider = new AppBackstageItemProvider();
-
-  public componentDidMount() {
-    UiItemsManager.register(this._provider);
-  }
-
-  public componentWillUnmount() {
-    UiItemsManager.unregister(this._provider.id);
-  }
-
   public render() {
     return (
       <Provider store={App.store} >
-        <ToolbarDragInteractionContext.Provider value={false}>
-          <FrameworkVersion version={"1"}>
-            <IModelWrapper>
-              <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
-            </IModelWrapper>
-          </FrameworkVersion>
-        </ToolbarDragInteractionContext.Provider>
+        <ThemeManager>
+          <ToolbarDragInteractionContext.Provider value={false}>
+            <FrameworkVersion version={"2"}>
+              <IModelWrapper>
+                <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
+              </IModelWrapper>
+            </FrameworkVersion>
+          </ToolbarDragInteractionContext.Provider>
+        </ThemeManager>
       </Provider >
     );
   }
