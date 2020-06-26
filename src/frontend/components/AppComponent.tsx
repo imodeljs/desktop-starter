@@ -371,7 +371,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 }
 
-// since we are not closing the current stage to pick a new snapshow we must wrap components to force un-mounting and re-mounting the stage.
+// since we are not closing the current stage to pick a new snapshot we must wrap components to force un-mounting and re-mounting the stage.
 function IModelWrapper({ children }: { children: React.ReactNode }) {
   const activeImodel = useActiveIModelConnection();
   return <React.Fragment key={activeImodel ? activeImodel.iModelId : "no-imodel"}>{children}</React.Fragment>
