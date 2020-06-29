@@ -5,7 +5,7 @@
 import * as React from "react";
 import * as path from "path";
 import { Provider } from "react-redux";
-import { Config, OpenMode } from "@bentley/bentleyjs-core";
+import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
 import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
 import { IModelQuery } from "@bentley/imodelhub-client";
 import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
@@ -185,6 +185,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
+    const defaultViewId = await imodel.views.queryDefaultViewId();
+    if (defaultViewId && Id64.isValidId64(defaultViewId))
+      return imodel.views.load(defaultViewId);
+
     const viewSpecs = await imodel.views.queryProps({});
     const acceptedViewClasses = [
       "BisCore:SpatialViewDefinition",
@@ -192,7 +196,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       "BisCore:OrthographicViewDefinition",
     ];
     const acceptedViewSpecs = viewSpecs.filter((spec) => (-1 !== acceptedViewClasses.indexOf(spec.classFullName)));
-    if (!acceptedViewSpecs) {
+    if (!acceptedViewSpecs || acceptedViewSpecs.length < 1) {
       MessageManager.outputMessage(new NotifyMessageDetails(OutputMessagePriority.Error, IModelApp.i18n.translate("App:noViewDefinition"), undefined, OutputMessageType.Alert));
       return null;
     }

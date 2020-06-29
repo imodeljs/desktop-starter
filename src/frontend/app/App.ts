@@ -8,7 +8,7 @@ import { DesktopAuthorizationClientConfiguration, ElectronRpcManager } from "@be
 import { DesktopAuthorizationClient, IModelApp, IModelAppOptions } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { AppNotificationManager, ConfigurableUiManager,  FrontstageManager, UiFramework } from "@bentley/ui-framework";
+import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
 import { AppState, AppStore } from "./AppState";
 import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
 
@@ -33,7 +33,7 @@ export class App {
     await App.initializeOidc();
 
     // initialize Presentation
-    await Presentation.initialize({activeLocale: IModelApp.i18n.languageList()[0]});
+    await Presentation.initialize({ activeLocale: IModelApp.i18n.languageList()[0] });
 
     // initialize RPC communication
     ElectronRpcManager.initializeClient({}, getSupportedRpcs());
@@ -49,6 +49,9 @@ export class App {
 
     // initialize IModelSelect
     await IModelSelect.initialize(IModelApp.i18n);
+
+    // initialize to use "dark" theme
+    UiFramework.setColorTheme(ColorTheme.Dark);
 
     // initialize the ConfigurableUiManager
     ConfigurableUiManager.initialize();

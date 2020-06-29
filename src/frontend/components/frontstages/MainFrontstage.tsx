@@ -61,6 +61,14 @@ export class MainFrontstage extends FrontstageProvider {
             ]}
           />
         }
+        toolSettings={
+          < Zone
+            widgets={
+              [
+                <Widget isToolSettings={true} />,
+              ]}
+          />
+        }
         viewNavigationTools={
           <Zone
             widgets={[
