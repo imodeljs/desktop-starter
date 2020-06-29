@@ -10,7 +10,7 @@ import { ContextRegistryClient, Project } from "@bentley/context-registry-client
 import { IModelQuery } from "@bentley/imodelhub-client";
 import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection, ThemeManager } from "@bentley/ui-framework";
+import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection } from "@bentley/ui-framework";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 import { App } from "../app/App";

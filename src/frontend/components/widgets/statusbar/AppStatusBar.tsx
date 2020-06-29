@@ -6,7 +6,7 @@ import * as React from "react";
 
 import { StatusBarSection } from "@bentley/ui-abstract";
 import {
-  ClearEmphasisStatusField, FooterModeField, MessageCenterField, SectionsStatusField, SelectionScopeField,
+  FooterModeField, MessageCenterField, SectionsStatusField, SelectionScopeField,
   StatusBarComposer, StatusBarItem, StatusBarItemUtilities, StatusBarWidgetControl, StatusBarWidgetControlArgs,
   ToolAssistanceField, withMessageCenterFieldProps, withStatusFieldProps,
 } from "@bentley/ui-framework";
@@ -15,7 +15,6 @@ import { FooterSeparator } from "@bentley/ui-ninezone";
 const ToolAssistance = withStatusFieldProps(ToolAssistanceField); // tslint:disable-line: variable-name
 const MessageCenter = withMessageCenterFieldProps(MessageCenterField); // tslint:disable-line: variable-name
 const Sections = withStatusFieldProps(SectionsStatusField); // tslint:disable-line: variable-name
-const ClearEmphasis = withStatusFieldProps(ClearEmphasisStatusField); // tslint:disable-line: variable-name
 const SelectionScope = withStatusFieldProps(SelectionScopeField); // tslint:disable-line: variable-name
 const FooterOnlyDisplay = withStatusFieldProps(FooterModeField); // tslint:disable-line: variable-name
 
@@ -34,13 +33,10 @@ export class AppStatusBarWidget extends StatusBarWidgetControl {
       const statusBarItems: StatusBarItem[] = [];
 
       statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("MessageCenter", StatusBarSection.Left, 10, <MessageCenter />));
-      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("PreToolAssistance", StatusBarSection.Left, 15, this.footerModeOnlySeparator));
+      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("Separator1", StatusBarSection.Left, 15, this.footerModeOnlySeparator));
       statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("ToolAssistance", StatusBarSection.Left, 20, <ToolAssistance />));
-      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("PostToolAssistance", StatusBarSection.Left, 25, this.footerModeOnlySeparator));
-
-      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("ClearEmphasis", StatusBarSection.Center, 10, <ClearEmphasis hideWhenUnused={true} />));
-      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("Sections", StatusBarSection.Center, 20, <Sections />));
-
+      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("Separator2", StatusBarSection.Left, 25, this.footerModeOnlySeparator));
+      statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("Sections", StatusBarSection.Center, 20, <Sections hideWhenUnused={true} />));
       statusBarItems.push(StatusBarItemUtilities.createStatusBarItem("SelectionScope", StatusBarSection.Right, 10, <SelectionScope />));
 
       this._statusBarItems = statusBarItems;
