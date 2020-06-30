@@ -10,16 +10,6 @@
   },
   "backstage": {
     "selectIModel": "Select iModel",
-    "selectSnapshot": "Select Snapshot",
-    "settings": "Settings"
-  },
-  "settingsStage": {
-    "settings": "Settings",
-    "light": "Light",
-    "dark": "Dark",
-    "themeTitle": "THEME",
-    "themeDescription": "Toggle the theme between light and dark",
-    "useProximityOpacityTitle": "Change Toolbar Opacity",
-    "useProximityOpacityDescription": "Change the toolbar opacity as the mouse gets closer or farther away"
+    "selectSnapshot": "Select Snapshot"
   }
 }
