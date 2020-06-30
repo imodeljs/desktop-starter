@@ -166,12 +166,11 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   private _onUserStateChanged = () => {
-    this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }));
-
-    if (this._isAutoOpen && this.state.user.isAuthorized) {
-      // tslint:disable-next-line: no-floating-promises
-      this._handleOpen();
-    }
+    this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
+      if (this._isAutoOpen && this.state.user.isAuthorized) {
+        await this._handleOpen();
+      }
+    });
   }
 
   private _onRegister = () => {
