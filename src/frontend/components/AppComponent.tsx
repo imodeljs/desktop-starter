@@ -176,10 +176,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
   }
 
-  private _onRegister = () => {
-    window.open("https://git.io/fx8YP", "_blank");
-  }
-
   private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
@@ -263,7 +259,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this.state.user.isAuthorized && !this._wantSnapshot) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onRegister={this._onRegister} />);
+      ui = (<SignIn onSignIn={this._onStartSignin}/>);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents/>;
