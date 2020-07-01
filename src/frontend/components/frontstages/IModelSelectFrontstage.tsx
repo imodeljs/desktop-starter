@@ -3,11 +3,14 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
+
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
-import { App } from "../../app/App";
-import { BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
-  FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
+import {
+    BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
+    CoreTools, Frontstage, FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
 } from "@bentley/ui-framework";
+
+import { App } from "../../app/App";
 
 class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {

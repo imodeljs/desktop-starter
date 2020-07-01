@@ -2,14 +2,16 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { UserInfo } from "@bentley/itwin-client";
-import { BackstageComposer, UserProfileBackstageItem } from "@bentley/ui-framework";
 import * as React from "react";
 import { connect } from "react-redux";
-import { RootState } from "../../app/AppState";
+
 import { IModelApp } from "@bentley/imodeljs-frontend";
+import { UserInfo } from "@bentley/itwin-client";
 import { BackstageItemUtilities } from "@bentley/ui-abstract";
+import { BackstageComposer, UserProfileBackstageItem } from "@bentley/ui-framework";
+
 import { App } from "../../app/App";
+import { RootState } from "../../app/AppState";
 
 function mapStateToProps(state: RootState) {
   const frameworkState = state.frameworkState;

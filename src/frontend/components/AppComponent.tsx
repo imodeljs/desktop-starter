@@ -2,24 +2,33 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import * as React from "react";
-import * as path from "path";
-import { Provider } from "react-redux";
-import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
-import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
-import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
-import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
-  NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
-import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework } from "@bentley/ui-framework";
-import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
-import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
-import { App } from "../app/App";
-import { SwitchState } from "../app/AppState";
-import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 // make sure webfont brings in the icons and css files.
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import "./AppComponent.css";
+
+import * as path from "path";
+import * as React from "react";
+import { Provider } from "react-redux";
+
+import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
+import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
+import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
+import {
+    AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection,
+    MessageBoxIconType, MessageBoxType, NotifyMessageDetails, OutputMessagePriority,
+    OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState,
+} from "@bentley/imodeljs-frontend";
+import { SignIn } from "@bentley/ui-components";
+import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
+import {
+    ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager,
+    SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework,
+} from "@bentley/ui-framework";
+
+import { App } from "../app/App";
+import { SwitchState } from "../app/AppState";
+import { MainFrontstage } from "../components/frontstages/MainFrontstage";
+import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;

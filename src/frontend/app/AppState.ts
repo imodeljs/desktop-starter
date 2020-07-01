@@ -2,8 +2,11 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState } from "@bentley/ui-framework";
 import { combineReducers, createStore, Store } from "redux";
+
+import {
+    ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState,
+} from "@bentley/ui-framework";
 
 // Valid values for SwitchIModelState.switchState
 export enum SwitchState {

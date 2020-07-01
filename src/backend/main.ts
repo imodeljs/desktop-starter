@@ -3,13 +3,17 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as path from "path";
+
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
-import { IModelJsElectronManager, StandardElectronManager, WebpackDevServerElectronManager } from "@bentley/electron-manager";
+import {
+    IModelJsElectronManager, StandardElectronManager, WebpackDevServerElectronManager,
+} from "@bentley/electron-manager";
 import { IModelHost } from "@bentley/imodeljs-backend";
-import { Presentation } from "@bentley/presentation-backend";
 import { ElectronRpcManager, RpcInterfaceDefinition } from "@bentley/imodeljs-common";
-import { getSupportedRpcs } from "../common/rpcs";
+import { Presentation } from "@bentley/presentation-backend";
+
 import { AppLoggerCategory } from "../common/LoggerCategory";
+import { getSupportedRpcs } from "../common/rpcs";
 
 // Setup logging immediately to pick up any logging during IModelHost.startup()
 Logger.initializeToConsole();

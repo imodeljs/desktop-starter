@@ -3,11 +3,15 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-import { Button, ButtonSize, ButtonType, FillCentered, Headline } from "@bentley/ui-core";
-import { BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage, FrontstageManager,
-  FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
-} from "@bentley/ui-framework";
+
 import { IModelApp } from "@bentley/imodeljs-frontend";
+import { Button, ButtonSize, ButtonType, FillCentered, Headline } from "@bentley/ui-core";
+import {
+    BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
+    CoreTools, Frontstage, FrontstageManager, FrontstageProps, FrontstageProvider,
+    ToolWidgetComposer, Widget, Zone,
+} from "@bentley/ui-framework";
+
 import { App } from "../../app/App";
 
 class SnapshotSelectControl extends ContentControl {

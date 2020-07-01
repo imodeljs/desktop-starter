@@ -6,9 +6,10 @@ import * as React from "react";
 
 import { StatusBarSection } from "@bentley/ui-abstract";
 import {
-  FooterModeField, MessageCenterField, SectionsStatusField, SelectionScopeField,
-  StatusBarComposer, StatusBarItem, StatusBarItemUtilities, StatusBarWidgetControl, StatusBarWidgetControlArgs,
-  ToolAssistanceField, withMessageCenterFieldProps, withStatusFieldProps,
+    FooterModeField, MessageCenterField, SectionsStatusField, SelectionScopeField,
+    StatusBarComposer, StatusBarItem, StatusBarItemUtilities, StatusBarWidgetControl,
+    StatusBarWidgetControlArgs, ToolAssistanceField, withMessageCenterFieldProps,
+    withStatusFieldProps,
 } from "@bentley/ui-framework";
 import { FooterSeparator } from "@bentley/ui-ninezone";
 

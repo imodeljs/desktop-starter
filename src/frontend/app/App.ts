@@ -4,16 +4,22 @@
 *--------------------------------------------------------------------------------------------*/
 import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
-import { DesktopAuthorizationClientConfiguration, ElectronRpcManager } from "@bentley/imodeljs-common";
-import { DesktopAuthorizationClient, IModelApp, IModelAppOptions } from "@bentley/imodeljs-frontend";
-import { Presentation } from "@bentley/presentation-frontend";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
-import { AppState, AppStore } from "./AppState";
-import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
-import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
+import {
+    DesktopAuthorizationClientConfiguration, ElectronRpcManager,
+} from "@bentley/imodeljs-common";
+import {
+    DesktopAuthorizationClient, IModelApp, IModelAppOptions,
+} from "@bentley/imodeljs-frontend";
+import { Presentation } from "@bentley/presentation-frontend";
+import {
+    AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework,
+} from "@bentley/ui-framework";
 
 import { getSupportedRpcs } from "../../common/rpcs";
+import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
+import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
+import { AppState, AppStore } from "./AppState";
 
 export class App {
   private static _appState: AppState;

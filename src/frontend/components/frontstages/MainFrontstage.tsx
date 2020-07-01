@@ -3,11 +3,13 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
+
 import {
-  BasicNavigationWidget, BasicToolWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools,
-  CustomItemDef, Frontstage, FrontstageProvider, IModelViewportControl,
-  SyncUiEventId, ToolbarHelper, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
+    BasicNavigationWidget, BasicToolWidget, ContentGroup, ContentLayoutDef, ContentViewManager,
+    CoreTools, CustomItemDef, Frontstage, FrontstageProvider, IModelViewportControl, SyncUiEventId,
+    ToolbarHelper, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
 } from "@bentley/ui-framework";
+
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 import { AppStatusBarWidget } from "../widgets/statusbar/AppStatusBar";
 
