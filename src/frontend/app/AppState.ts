@@ -10,7 +10,8 @@ export enum SwitchState {
   None = 0,
   SelectIModel = 1,
   SelectSnapshot = 2,
-  OpenIt = 3,
+  OpenIModel = 3,
+  OpenSnapshot = 4,
 }
 
 export interface SelectedIModel {
@@ -22,18 +23,21 @@ export interface SelectedIModel {
 export interface SwitchIModelState {
   switchState: SwitchState;
   selectedIModel: SelectedIModel | null;
+  selectedSnapshot: string;
 }
 
 const initialState: SwitchIModelState = {
   switchState: SwitchState.None,
   selectedIModel: null,
+  selectedSnapshot: "",
 };
 
 // tslint:disable-next-line:variable-name
 export const SwitchIModelActions = {
   selectIModel: () => createAction("App:SELECT_IMODEL", {}),
   selectSnapshot: () => createAction("App:SELECT_SNAPSHOT", {}),
-  openIt: (selectedIModel: SelectedIModel) => createAction("App:OPEN_IT", selectedIModel),
+  openIModel: (selectedIModel: SelectedIModel) => createAction("App:OPEN_IMODEL", selectedIModel),
+  openSnapshot: (selectedSnapshot: string) => createAction("App:OPEN_SNAPSHOT", selectedSnapshot),
 };
 
 export type SwitchIModelActionsUnion = ActionsUnion<typeof SwitchIModelActions>;
@@ -44,8 +48,10 @@ function AppReducer(state: SwitchIModelState = initialState, action: SwitchIMode
       return { ...state, switchState: SwitchState.SelectIModel };
     case "App:SELECT_SNAPSHOT":
       return { ...state, switchState: SwitchState.SelectSnapshot };
-    case "App:OPEN_IT":
-      return { ...state, switchState: SwitchState.OpenIt, selectedIModel: action.payload };
+    case "App:OPEN_IMODEL":
+      return { ...state, switchState: SwitchState.OpenIModel, selectedIModel: action.payload };
+    case "App:OPEN_SNAPSHOT":
+      return { ...state, switchState: SwitchState.OpenSnapshot, selectedSnapshot: action.payload };
     default:
       return { ...state, switchState: SwitchState.None };
   }

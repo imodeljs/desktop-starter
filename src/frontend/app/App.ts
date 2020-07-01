@@ -11,6 +11,7 @@ import { IModelSelect } from "@bentley/imodel-select-react";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
 import { AppState, AppStore } from "./AppState";
 import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
+import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
 
 import { getSupportedRpcs } from "../../common/rpcs";
 
@@ -58,6 +59,9 @@ export class App {
 
     // Create a FrontStage where we can select a project/iModel.
     FrontstageManager.addFrontstageProvider(new IModelSelectFrontstage());
+
+    // Create a FrontStage where we can select a snapshot.
+    FrontstageManager.addFrontstageProvider(new SnapshotSelectFrontstage());
   }
 
   public static async initializeOidc() {
