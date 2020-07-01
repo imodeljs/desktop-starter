@@ -3,7 +3,6 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-// import { CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@bentley/ui-abstract";
 import {
   BasicNavigationWidget, BasicToolWidget, ContentGroup, ContentLayoutDef, ContentViewManager, CoreTools,
   CustomItemDef, Frontstage, FrontstageProvider, IModelViewportControl,
@@ -122,35 +121,3 @@ export class MainFrontstage extends FrontstageProvider {
     });
   }
 }
-
-// /**
-//  * Define a ToolWidget with Buttons to display in the TopLeft zone.
-//  */
-// export function TopLeftToolWidget() {
-//
-//   const getVerticalToolbarItems = React.useCallback(
-//     (): CommonToolbarItem[] => {
-//       const items: CommonToolbarItem[] = [];
-//       items.push(
-//         ToolbarHelper.createToolbarItemFromItemDef(10, CoreTools.selectElementCommand),
-//       );
-//       return items;
-//     }, []);
-//
-//   const [verticalItems, setVerticalItems] = React.useState(() => getVerticalToolbarItems());
-//
-//   const isInitialMount = React.useRef(true);
-//   React.useEffect(() => {
-//     if (isInitialMount.current)
-//       isInitialMount.current = false;
-//     else
-//       setVerticalItems(getVerticalToolbarItems());
-//   }, [getVerticalToolbarItems]);
-//
-//   return (
-//     <ToolWidgetComposer
-//       cornerItem={<BackstageAppButton />}
-//       verticalToolbar={<ToolbarComposer items={verticalItems} usage={ToolbarUsage.ContentManipulation} orientation={ToolbarOrientation.Vertical} />}
-//     />
-//   );
-// }
