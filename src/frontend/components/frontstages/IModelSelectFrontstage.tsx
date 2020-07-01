@@ -5,15 +5,15 @@
 import * as React from "react";
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
 import { App } from "../../app/App";
-import { ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
-  FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, UiFramework,
+import { BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
+  FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, ToolWidgetComposer, UiFramework, Widget, Zone,
 } from "@bentley/ui-framework";
 
 class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {
     super(info, options);
 
-    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel} showSignoutButton={false} showBackstageButton={true} />;
+    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel}/>;
   }
 
   // called when an imodel has been selected on the IModelSelect
@@ -56,6 +56,15 @@ export class IModelSelectFrontstage extends FrontstageProvider {
         defaultLayout={this._contentLayoutDef}
         contentGroup={contentGroup}
         isInFooterMode={false}
+
+        contentManipulationTools={
+          <Zone
+            widgets={[
+              <Widget isFreeform={true} element={<ToolWidgetComposer cornerItem={<BackstageAppButton/>}/>} />,
+            ]}
+          />
+        }
+
       />
     );
   }

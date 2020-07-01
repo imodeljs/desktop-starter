@@ -7,7 +7,9 @@ import { BackstageComposer, UserProfileBackstageItem } from "@bentley/ui-framewo
 import * as React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../app/AppState";
-import { AppBackstageItemProvider } from "./AppBackstageItemProvider";
+import { IModelApp } from "@bentley/imodeljs-frontend";
+import { BackstageItemUtilities } from "@bentley/ui-abstract";
+import { App } from "../../app/App";
 
 function mapStateToProps(state: RootState) {
   const frameworkState = state.frameworkState;
@@ -23,16 +25,20 @@ interface AppBackstageComposerProps {
   userInfo: UserInfo | undefined;
 }
 
-export class AppBackstageComposerComponent extends React.PureComponent<AppBackstageComposerProps> {
-  private _itemsProvider = new AppBackstageItemProvider();
-  public render() {
-    return (
-      <BackstageComposer
-        header={this.props.userInfo && <UserProfileBackstageItem userInfo={this.props.userInfo} />}
-        items={[...this._itemsProvider.backstageItems]}
-      />
-    );
-  }
+export function AppBackstageComposerComponent({ userInfo }: AppBackstageComposerProps) {
+  const [backstageItems] = React.useState(() => [
+    BackstageItemUtilities.createActionItem("SelectIModel", 100, 30, () => App.store.dispatch({ type: "App:SELECT_IMODEL" }),
+      IModelApp.i18n.translate("App:backstage.selectIModel"), undefined, "icon-placeholder"),
+    BackstageItemUtilities.createActionItem("SelectSnapshot", 100, 40, () => App.store.dispatch({ type: "App:SELECT_SNAPSHOT" }),
+      IModelApp.i18n.translate("App:backstage.selectSnapshot"), undefined, "icon-placeholder"),
+  ]);
+
+  return (
+    <BackstageComposer
+      header={userInfo && <UserProfileBackstageItem userInfo={userInfo} />}
+      items={backstageItems}
+    />
+  );
 }
 
 export const AppBackstageComposer = connect(mapStateToProps)(AppBackstageComposerComponent); // tslint:disable-line:variable-name
