@@ -6,14 +6,14 @@ import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
 import {
-    DesktopAuthorizationClientConfiguration, ElectronRpcManager,
+  DesktopAuthorizationClientConfiguration, ElectronRpcManager,
 } from "@bentley/imodeljs-common";
 import {
-    DesktopAuthorizationClient, IModelApp, IModelAppOptions,
+  DesktopAuthorizationClient, IModelApp, IModelAppOptions,
 } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import {
-    AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework,
+  AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework,
 } from "@bentley/ui-framework";
 
 import { getSupportedRpcs } from "../../common/rpcs";

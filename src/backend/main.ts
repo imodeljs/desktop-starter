@@ -6,7 +6,7 @@ import * as path from "path";
 
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
 import {
-    IModelJsElectronManager, StandardElectronManager, WebpackDevServerElectronManager,
+  IModelJsElectronManager, StandardElectronManager, WebpackDevServerElectronManager,
 } from "@bentley/electron-manager";
 import { IModelHost } from "@bentley/imodeljs-backend";
 import { ElectronRpcManager, RpcInterfaceDefinition } from "@bentley/imodeljs-common";

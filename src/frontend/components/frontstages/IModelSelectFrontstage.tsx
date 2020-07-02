@@ -6,8 +6,8 @@ import * as React from "react";
 
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
 import {
-    BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
-    CoreTools, Frontstage, FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
+  BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
+  CoreTools, Frontstage, FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
 } from "@bentley/ui-framework";
 
 import { App } from "../../app/App";

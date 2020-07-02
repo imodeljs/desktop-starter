@@ -5,7 +5,7 @@
 import { combineReducers, createStore, Store } from "redux";
 
 import {
-    ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState,
+  ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState,
 } from "@bentley/ui-framework";
 
 // Valid values for SwitchIModelState.switchState

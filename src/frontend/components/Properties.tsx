@@ -3,12 +3,11 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-
 import ReactResizeDetector from "react-resize-detector";
 
 import { IModelConnection } from "@bentley/imodeljs-frontend";
 import {
-    PresentationPropertyDataProvider, propertyGridWithUnifiedSelection,
+  PresentationPropertyDataProvider, propertyGridWithUnifiedSelection,
 } from "@bentley/presentation-components";
 import { PropertyGrid } from "@bentley/ui-components";
 import { Orientation, useDisposable } from "@bentley/ui-core";

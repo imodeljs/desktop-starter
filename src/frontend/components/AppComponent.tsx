@@ -14,15 +14,15 @@ import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
 import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
 import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
 import {
-    AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection,
-    MessageBoxIconType, MessageBoxType, NotifyMessageDetails, OutputMessagePriority,
-    OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState,
+  AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection,
+  MessageBoxIconType, MessageBoxType, NotifyMessageDetails, OutputMessagePriority,
+  OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import {
-    ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager,
-    SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework,
+  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager,
+  SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework,
 } from "@bentley/ui-framework";
 
 import { App } from "../app/App";

@@ -3,8 +3,8 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import {
-    IModelReadRpcInterface, IModelTileRpcInterface, RpcInterfaceDefinition,
-    SnapshotIModelRpcInterface,
+  IModelReadRpcInterface, IModelTileRpcInterface, RpcInterfaceDefinition,
+  SnapshotIModelRpcInterface,
 } from "@bentley/imodeljs-common";
 import { PresentationRpcInterface } from "@bentley/presentation-common";
 
