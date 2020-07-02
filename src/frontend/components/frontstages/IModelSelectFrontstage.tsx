@@ -3,11 +3,14 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
+
 import { IModelInfo, IModelSelector } from "@bentley/imodel-select-react";
-import { App } from "../../app/App";
-import { BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage,
-  FrontstageProps, FrontstageProvider, SyncUiEventDispatcher, ToolWidgetComposer, UiFramework, Widget, Zone,
+import {
+  BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
+  CoreTools, Frontstage, FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
 } from "@bentley/ui-framework";
+
+import { App } from "../../app/App";
 
 class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {
@@ -18,14 +21,8 @@ class IModelSelectorControl extends ContentControl {
 
   // called when an imodel has been selected on the IModelSelect
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
-    const currentIModelConnection = UiFramework.getIModelConnection();
-    if (currentIModelConnection) {
-      SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-      await currentIModelConnection.close();
-      UiFramework.setIModelConnection(undefined);
-    }
 
-    App.store.dispatch({type: "App:OPEN_IT", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
+    App.store.dispatch({type: "App:OPEN_IMODEL", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
   }
 }
 

@@ -2,24 +2,33 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import * as React from "react";
-import * as path from "path";
-import { Provider } from "react-redux";
-import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
-import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
-import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
-import { AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
-  NotifyMessageDetails, OutputMessagePriority, OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState } from "@bentley/imodeljs-frontend";
-import { SignIn } from "@bentley/ui-components";
-import { ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework, useActiveIModelConnection } from "@bentley/ui-framework";
-import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
-import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
-import { App } from "../app/App";
-import { SwitchState } from "../app/AppState";
-import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 // make sure webfont brings in the icons and css files.
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import "./AppComponent.css";
+
+import * as path from "path";
+import * as React from "react";
+import { Provider } from "react-redux";
+
+import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
+import { ContextRegistryClient, Project } from "@bentley/context-registry-client";
+import { HubIModel, IModelQuery } from "@bentley/imodelhub-client";
+import {
+  AuthorizedFrontendRequestContext, FrontendRequestContext, IModelApp, IModelConnection,
+  MessageBoxIconType, MessageBoxType, NotifyMessageDetails, OutputMessagePriority,
+  OutputMessageType, RemoteBriefcaseConnection, SnapshotConnection, ViewState,
+} from "@bentley/imodeljs-frontend";
+import { SignIn } from "@bentley/ui-components";
+import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
+import {
+  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, MessageManager,
+  SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework,
+} from "@bentley/ui-framework";
+
+import { App } from "../app/App";
+import { SwitchState } from "../app/AppState";
+import { MainFrontstage } from "../components/frontstages/MainFrontstage";
+import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -111,14 +120,22 @@ export default class AppComponent extends React.Component<{}, AppState> {
         await FrontstageManager.setActiveFrontstageDef(frontstageDef);
       } else if (switchState === SwitchState.SelectSnapshot) {
         this._wantSnapshot = true;
-        await this._handleSelectSnapshot();
-      } else if (switchState === SwitchState.OpenIt) {
+        const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
+        await FrontstageManager.setActiveFrontstageDef(frontstageDef);
+      } else if (switchState === SwitchState.OpenIModel) {
         const selectedIModel = App.store.getState().switchIModelState.selectedIModel;
         if (selectedIModel) {
           this.projectName = selectedIModel.projectName;
           this.imodelName = selectedIModel.imodelName;
           this.snapshotName = null;
           this._wantSnapshot = false;
+          await this._handleOpen();
+        }
+      } else if (switchState === SwitchState.OpenSnapshot) {
+        const selectedSnapshot: string = App.store.getState().switchIModelState.selectedSnapshot;
+        if (selectedSnapshot) {
+          this.snapshotName = selectedSnapshot;
+          this._wantSnapshot = true;
           await this._handleOpen();
         }
       }
@@ -228,12 +245,12 @@ export default class AppComponent extends React.Component<{}, AppState> {
         this.saveAutoOpenConfig();
       } else {
         // If we failed to find a viewState, then we will just close the imodel and allow the user to select a different shapshot/iModel
-        await imodel.close();
+        await AppComponent.closeCurrentIModel();
         this.doReselectOnError();
       }
     } catch (e) {
       // if failed, close the imodel and reset the state
-      await imodel.close();
+      await AppComponent.closeCurrentIModel();
       alert(e.message);
       this.doReselectOnError();
     }
@@ -279,35 +296,22 @@ export default class AppComponent extends React.Component<{}, AppState> {
     );
   }
 
-  private _handleSelectSnapshot = async () => {
-    const options = {
-      properties: ["openFile"],
-      filters: [{ name: "iModels", extensions: ["ibim", "bim"] }],
-    };
+  public static async closeCurrentIModel() {
+    const currentIModelConnection = UiFramework.getIModelConnection();
+    if (currentIModelConnection) {
+      SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
 
-    let filenames;
-
-    try {
-      filenames = this.getRemote().dialog.showOpenDialogSync(options);
-    } catch (e) { }
-
-    if (filenames) {
-      this.projectName = "";
-      this.imodelName = "";
-      this.snapshotName = filenames[0];
-      const currentIModelConnection = UiFramework.getIModelConnection();
-      if (currentIModelConnection) {
-        SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-        await currentIModelConnection.close();
-        UiFramework.setIModelConnection(undefined);
-      }
-      await this._handleOpen();
+      await currentIModelConnection.close();
+      UiFramework.setIModelConnection(undefined);
     }
   }
 
   private _handleOpen = async () => {
     this._isAutoOpen = false;
     this.setState({ isOpening: true });
+
+    // close previous iModel/snapshot (if open)
+    await AppComponent.closeCurrentIModel();
 
     if (this._wantSnapshot)
       return this._handleOpenSnapshot();
@@ -378,12 +382,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 }
 
-// since we are not closing the current stage to pick a new snapshot we must wrap components to force un-mounting and re-mounting the stage.
-function IModelWrapper({ children }: { children: React.ReactNode }) {
-  const activeImodel = useActiveIModelConnection();
-  return <React.Fragment key={activeImodel ? activeImodel.iModelId : "no-imodel"}>{children}</React.Fragment>
-}
-
 /** Renders a viewport and a property grid */
 class IModelComponents extends React.PureComponent {
   public render() {
@@ -392,9 +390,7 @@ class IModelComponents extends React.PureComponent {
         <ThemeManager>
           <ToolbarDragInteractionContext.Provider value={false}>
             <FrameworkVersion version={"2"}>
-              <IModelWrapper>
-                <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
-              </IModelWrapper>
+              <ConfigurableUiContent appBackstage={<AppBackstageComposer />} />
             </FrameworkVersion>
           </ToolbarDragInteractionContext.Provider>
         </ThemeManager>

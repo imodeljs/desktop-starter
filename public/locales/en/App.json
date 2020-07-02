@@ -9,7 +9,11 @@
     "properties": "Properties"
   },
   "backstage": {
-    "selectIModel": "Select iModel",
-    "selectSnapshot": "Select Snapshot"
+    "selectIModel": "Open Online iModel",
+    "selectSnapshot": "Open Offline Snapshot"
+  },
+  "snapshotSelect": {
+    "title": "Open Offline Snapshot",
+    "open": "Open File Dialog"
   }
 }

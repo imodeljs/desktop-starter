@@ -3,12 +3,14 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-import { useCallback } from "react"; // tslint:disable-line: no-duplicate-imports
 import ReactResizeDetector from "react-resize-detector";
+
 import { IModelConnection } from "@bentley/imodeljs-frontend";
-import { PresentationPropertyDataProvider, propertyGridWithUnifiedSelection } from "@bentley/presentation-components";
-import { Orientation, useDisposable } from "@bentley/ui-core";
+import {
+  PresentationPropertyDataProvider, propertyGridWithUnifiedSelection,
+} from "@bentley/presentation-components";
 import { PropertyGrid } from "@bentley/ui-components";
+import { Orientation, useDisposable } from "@bentley/ui-core";
 
 // create a HOC property grid component that supports unified selection
 // tslint:disable-next-line:variable-name
@@ -24,7 +26,7 @@ export interface Props {
 
 /** Property grid component for the viewer app */
 export default function SimplePropertiesComponent(props: Props) {
-  const dataProvider = useDisposable(useCallback(() => new PresentationPropertyDataProvider({ imodel: props.imodel }), [props.imodel]));
+  const dataProvider = useDisposable(React.useCallback(() => new PresentationPropertyDataProvider({ imodel: props.imodel }), [props.imodel]));
   return (
     <ReactResizeDetector handleWidth>
       {(width: number) => {
