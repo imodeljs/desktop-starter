@@ -135,6 +135,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
         const selectedSnapshot: string = App.store.getState().switchIModelState.selectedSnapshot;
         if (selectedSnapshot) {
           this.snapshotName = selectedSnapshot;
+          this.projectName = null;
+          this.imodelName = null;
           this._wantSnapshot = true;
           await this._handleOpen();
         }
@@ -193,8 +195,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
   private _onUserStateChanged = () => {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
       if (this.state.user.isAuthorized) {
-        if (this._isAutoOpen) await this._handleOpen();
-      } else this.clearAutoOpenConfig();
+        if (this._isAutoOpen)
+          await this._handleOpen();
+      } else
+        this.clearAutoOpenConfig();
     });
   }
 
@@ -314,8 +318,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-
-      await currentIModelConnection.close();
+      if (App.oidcClient.isAuthorized || currentIModelConnection.isSnapshot )
+        await currentIModelConnection.close();
       UiFramework.setIModelConnection(undefined);
     }
   }

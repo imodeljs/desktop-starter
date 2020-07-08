@@ -16,9 +16,9 @@ import { AppLoggerCategory } from "../common/LoggerCategory";
 import { getSupportedRpcs } from "../common/rpcs";
 
 // Setup logging immediately to pick up any logging during IModelHost.startup()
-Logger.initializeToConsole();
-Logger.setLevelDefault(LogLevel.Warning);
-Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
+// Logger.initializeToConsole();
+// Logger.setLevelDefault(LogLevel.Warning);
+// Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
 /**
  * Initializes Electron backend
