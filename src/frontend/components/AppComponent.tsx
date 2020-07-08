@@ -156,6 +156,13 @@ export default class AppComponent extends React.Component<{}, AppState> {
     window.localStorage.setItem("imjs_test_imodel", this.imodelName ? this.imodelName : "");
   }
 
+  // Clear snapshot, project, and iModel names in config.
+  private clearAutoOpenConfig() {
+    window.localStorage.setItem("imjs_offline_imodel", "");
+    window.localStorage.setItem("imjs_test_project", "");
+    window.localStorage.setItem("imjs_test_imodel", "");
+  }
+
   private getRemote(): any {
     return require("electron").remote;
   }
@@ -185,15 +192,22 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   private _onUserStateChanged = () => {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
-      if (this._isAutoOpen && this.state.user.isAuthorized) {
-        await this._handleOpen();
-      }
+      if (this.state.user.isAuthorized) {
+        if (this._isAutoOpen) await this._handleOpen();
+      } else this.clearAutoOpenConfig();
     });
   }
 
   private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
+  }
+
+  private _onOffline = async () => {
+    this._wantSnapshot = true;
+    const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
+    await FrontstageManager.setActiveFrontstageDef(frontstageDef);
+    this.setState({});
   }
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
@@ -277,8 +291,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
   public render() {
     let ui: React.ReactNode;
 
-    if (!this.state.user.isAuthorized && !this._wantSnapshot) {
-      ui = (<SignIn onSignIn={this._onStartSignin}/>);
+    if (!this._wantSnapshot && !this.state.user.isAuthorized) {
+      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline}/>)
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
