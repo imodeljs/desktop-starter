@@ -4,7 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 import * as path from "path";
 
-import { Logger, LogLevel } from "@bentley/bentleyjs-core";
+// import { Logger, LogLevel } from "@bentley/bentleyjs-core";
+import { Logger } from "@bentley/bentleyjs-core";
 import {
   IModelJsElectronManager, StandardElectronManager, WebpackDevServerElectronManager,
 } from "@bentley/electron-manager";

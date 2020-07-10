@@ -296,7 +296,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline}/>)
+      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline}/>);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
