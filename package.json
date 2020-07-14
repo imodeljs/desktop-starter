@@ -30,7 +30,8 @@
     "lint": "tslint -p . 1>&2",
     "pseudolocalize": "betools pseudolocalize --englishDir ./public/locales/en --out ./build/locales/en-PSEUDO",
     "start": "npm run build && run-p \"start:frontend\" \"electron:debug\"",
-    "start:frontend": "cross-env USE_FAST_SASS=true BROWSER=none react-scripts start"
+    "start:frontend": "cross-env USE_FAST_SASS=true BROWSER=none react-scripts start",
+    "pack": "electron-builder --dir"
   },
   "browserslist": [
     "electron 6.0.0",
@@ -43,6 +44,25 @@
     "not dead",
     "not <0.2%"
   ],
+  "build": {
+    "appId": "Bentley.DesktopStarter",
+    "productName": "Desktop Starter",
+    "extends": "react-cra",
+    "files": [
+      "build/**/*",
+      "lib/**/*",
+      "node_modules/**/*",
+      "!**/*.map",
+      "!**/*.d.ts",
+      "!**/*.tsbuildinfo"
+    ],
+    "extraMetadata": {
+      "main": "lib/backend/main.js"
+    },
+    "asarUnpack": [
+      "build/assets/**/*"
+    ]
+  },
   "dependencies": {
     "@bentley/backend-itwin-client": "^2.2.0",
     "@bentley/bentleyjs-core": "^2.2.0",
@@ -74,8 +94,6 @@
     "@bentley/ui-framework": "^2.2.0",
     "@bentley/ui-ninezone": "^2.2.0",
     "@bentley/webgl-compatibility": "^2.2.0",
-    "electron": "^8.3.4",
-    "electron-devtools-installer": "^2.2.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-redux": "^7.2.0",
@@ -92,6 +110,9 @@
     "@types/react-resize-detector": "^3.1.0",
     "cpx": "^1.5.0",
     "cross-env": "^5.1.4",
+    "electron": "^8.3.4",
+    "electron-builder": "^22.7.0",
+    "electron-devtools-installer": "^2.2.3",
     "node-sass": "^4.0.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^2.6.2",
