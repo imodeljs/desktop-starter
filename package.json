@@ -21,7 +21,7 @@
     "build:prod": "npm run build:backend && npm run build:frontend && npm run copy",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "react-scripts build",
-    "clean": "rimraf lib build",
+    "clean": "rimraf lib build dist",
     "copy": "npm run copy:assets && npm run copy:enUS",
     "copy:assets": "cpx \"./assets/*\" ./build/assets/",
     "copy:enUS": "cpx \"./build/locales/en/*\" ./build/locales/en-US/",
@@ -61,7 +61,10 @@
     },
     "asarUnpack": [
       "build/assets/**/*"
-    ]
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
   },
   "dependencies": {
     "@bentley/backend-itwin-client": "^2.2.0",
