@@ -5,3 +5,6 @@ assets/*.Tiles*
 node_modules
 build
 lib
+
+.DS_Store
+*.tgz

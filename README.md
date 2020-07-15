@@ -16,13 +16,7 @@ See <http://imodeljs.org> for comprehensive documentation on the iModel.js API a
     npm install
     ```
 
-2. Build the app:
-
-    ```sh
-    npm run build
-    ```
-
-3. Start the app:
+1. Start the app:
 
     ```sh
     npm start
