@@ -17,7 +17,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build:backend && cross-env USE_FAST_SASS=true npm run build:frontend && npm run pseudolocalize && npm run copy",
+    "build": "npm run build:backend && cross-env USE_FAST_SASS=true npm run build:frontend && npm run copy",
     "build:prod": "npm run build:backend && npm run build:frontend && npm run copy",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "react-scripts build",
@@ -28,7 +28,6 @@
     "electron": "electron lib/backend/main.js",
     "electron:debug": "cross-env NODE_ENV=development electron lib/backend/main.js",
     "lint": "tslint -p . 1>&2",
-    "pseudolocalize": "betools pseudolocalize --englishDir ./public/locales/en --out ./build/locales/en-PSEUDO",
     "start": "npm run build && run-p \"start:frontend\" \"electron:debug\"",
     "start:frontend": "cross-env USE_FAST_SASS=true BROWSER=none react-scripts start",
     "pack": "electron-builder --dir"
