@@ -30,7 +30,7 @@
     "lint": "tslint -p . 1>&2",
     "start": "npm run build && run-p \"start:frontend\" \"electron:debug\"",
     "start:frontend": "cross-env USE_FAST_SASS=true BROWSER=none react-scripts start",
-    "pack": "electron-builder --dir"
+    "build:pack": "electron-builder --dir"
   },
   "browserslist": [
     "electron 6.0.0",
