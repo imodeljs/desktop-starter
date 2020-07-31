@@ -18,7 +18,7 @@
   "private": true,
   "scripts": {
     "build": "npm run build:backend && cross-env USE_FAST_SASS=true npm run build:frontend && npm run copy",
-    "build:prod": "npm run build:backend && npm run build:frontend && npm run copy",
+    "build:prod": "run-p build:backend build:frontend copy",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "react-scripts build",
     "clean": "rimraf lib build dist",
@@ -30,7 +30,8 @@
     "lint": "tslint -p . 1>&2",
     "start": "npm run build && run-p \"start:frontend\" \"electron:debug\"",
     "start:frontend": "cross-env USE_FAST_SASS=true BROWSER=none react-scripts start",
-    "build:pack": "electron-builder --dir"
+    "build:pack": "electron-builder --dir",
+    "build:dist": "electron-builder"
   },
   "browserslist": [
     "electron 6.0.0",
@@ -43,28 +44,6 @@
     "not dead",
     "not <0.2%"
   ],
-  "build": {
-    "appId": "Bentley.DesktopStarter",
-    "productName": "Desktop Starter",
-    "extends": "react-cra",
-    "files": [
-      "build/**/*",
-      "lib/**/*",
-      "node_modules/**/*",
-      "!**/*.map",
-      "!**/*.d.ts",
-      "!**/*.tsbuildinfo"
-    ],
-    "extraMetadata": {
-      "main": "lib/backend/main.js"
-    },
-    "asarUnpack": [
-      "build/assets/**/*"
-    ],
-    "mac": {
-      "category": "public.app-category.developer-tools"
-    }
-  },
   "dependencies": {
     "@bentley/backend-itwin-client": "^2.2.0",
     "@bentley/bentleyjs-core": "^2.2.0",
@@ -117,6 +96,7 @@
     "electron-devtools-installer": "^2.2.3",
     "node-sass": "^4.0.0",
     "npm-run-all": "^4.1.5",
+    "release-it": "^13.6.5",
     "rimraf": "^2.6.2",
     "tslint": "^5.16.0",
     "typescript": "~3.7.4",

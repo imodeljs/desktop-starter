@@ -1,0 +1,9 @@
+hooks:
+  after:bump: npx run-s lint build:prod build:dist
+npm:
+  publish: false
+git:
+  tagName: v${version}
+github:
+  assets:
+  - dist/*.zip
