@@ -1,0 +1,22 @@
+name: Release
+on: workflow_dispatch
+
+jobs:
+  windows:
+    name: Windows Release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: |
+          git config --global user.email "38288322+imodeljs-admin@users.noreply.github.com"
+          git config --global user.name "imodeljs-admin[bot]"
+        name: git config
+      - run: npm ci
+      # See .release-it.yml for build steps that it will run after bumping the version
+      - run: npx release-it -VV --ci --github.release=true
+        name: release-it
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
