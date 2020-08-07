@@ -170,10 +170,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   private getDefaultSnapshot(): string {
-    let defaultPath = "assets";
+    let assetsPath = "assets";
     if (this.getRemote().app.isPackaged)
-      defaultPath = path.join("resources", "app", "assets");
-    return path.join(defaultPath, "Baytown.bim");
+      assetsPath = path.join(this.getRemote().app.getAppPath(), "build", "assets").replace("app.asar", "app.asar.unpacked");
+    return path.join(assetsPath, "Baytown.bim");
   }
 
   public componentDidMount() {
