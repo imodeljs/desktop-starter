@@ -1,0 +1,70 @@
+name: Create Release on PR Trigger
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  create_release:
+    name: Windows Release
+    runs-on: windows-latest
+    if: ${{ startsWith(github.event.pull_request.title, '[Bump Version] ') }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: |
+          git config --global user.email "38288322+imodeljs-admin@users.noreply.github.com"
+          git config --global user.name "imodeljs-admin[bot]"
+        name: git config
+      - run: npm ci
+      - run: npx run-s lint build:prod build:dist
+      - uses: actions/github-script@v2
+        name: create release
+        with:
+          script: |
+            const prKeyword = '[Bump Version] ';
+            const newVersion = context.payload.pull_request.title.slice(prKeyword.length);
+            console.log(`Attempting a release for version '${newVersion}' (PR title='${context.payload.pull_request.title}')`);
+
+            const fs = require('fs');
+            const proc = require('child_process');
+            const git = (args) => { console.log(`$ git ${args}`); proc.spawnSync('git', args, { stdio: 'inherit' }); };
+            const runWithOpts = async (funcName, opts) => {
+                console.log(`${funcName} opts: ${JSON.stringify(opts)}`);
+                const res = await eval(funcName)(opts);
+                console.log(`${funcName} response: ${JSON.stringify(res)}`);
+                return res;
+            };
+
+            git(['tag', '-a', newVersion, '-m', newVersion]);
+            git(['push', 'origin', newVersion]);
+
+            const release = await runWithOpts('github.repos.createRelease', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: newVersion,
+                name: newVersion,
+                draft: true
+            });
+
+            const plainVersion = newVersion.slice(1); // remove the leading 'v'
+            const artifactName = `Desktop.Starter-${plainVersion}-win.zip`;
+            const artifactPath = './dist/' + artifactName;
+            await runWithOpts('github.repos.uploadReleaseAsset', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.data.id,
+                name: artifactName,
+                headers: {
+                'content-length': fs.statSync(artifactPath).size
+                },
+                data: fs.createReadStream(artifactPath)
+            });
+
+            await runWithOpts('github.repos.updateRelease', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.data.id,
+              draft: false
+            });

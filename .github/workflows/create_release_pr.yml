@@ -1,0 +1,46 @@
+name: Create PR to Trigger Release
+on: workflow_dispatch
+
+jobs:
+  create_release_pr:
+    name: Create PR to Trigger Release
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: |
+          git config --global user.email "38288322+imodeljs-admin@users.noreply.github.com"
+          git config --global user.name "imodeljs-admin[bot]"
+        name: git config
+      - uses: actions/github-script@v2
+        with:
+          script: |
+            const proc = require('child_process');
+            const capture = (prog, args) => { console.log(`$ ${prog} ${args}`); return proc.spawnSync(prog, args).stdout.toString().trim(); };
+            const run = (prog, args) => { console.log(`$ ${prog} ${args}`); proc.spawnSync(prog, args, { stdio: 'inherit' }); };
+            const runWithOpts = async (funcName, opts) => {
+                console.log(`${funcName} opts: ${JSON.stringify(opts)}`);
+                const res = await eval(funcName)(opts);
+                console.log(`${funcName} response: ${JSON.stringify(res)}`);
+                return res;
+            };
+
+            const newVersion = capture('npm', ['version', 'patch', '--no-git-tag-version']);
+            console.log(`newVersion='${newVersion}'`);
+
+            run('git', ['checkout', '-b', newVersion]);
+            run('git', ['status']);
+            run('git', ['diff']);
+            run('git', ['add', '.']);
+            run('git', ['commit', '-m', newVersion]);
+            run('git', ['push', '-u', 'origin', 'HEAD']);
+
+            await runWithOpts('github.pulls.create', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Bump Version] ${newVersion}`,
+              head: newVersion,
+              base: 'master'
+            });
