@@ -50,14 +50,14 @@ jobs:
 
             const plainVersion = newVersion.slice(1); // remove the leading 'v'
             const artifactName = `Desktop.Starter-${plainVersion}-win.zip`;
-            const artifactPath = './dist/' + artifactName;
+            const artifactPath = `./dist/${artifactName}`;
             await runWithOpts('github.repos.uploadReleaseAsset', {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 release_id: release.data.id,
                 name: artifactName,
                 headers: {
-                'content-length': fs.statSync(artifactPath).size
+                  'content-length': fs.statSync(artifactPath).size
                 },
                 data: fs.createReadStream(artifactPath)
             });

@@ -31,9 +31,9 @@ jobs:
             console.log(`newVersion='${newVersion}'`);
 
             run('git', ['checkout', '-b', newVersion]);
+            run('git', ['add', '.']);
             run('git', ['status']);
             run('git', ['diff']);
-            run('git', ['add', '.']);
             run('git', ['commit', '-m', newVersion]);
             run('git', ['push', '-u', 'origin', 'HEAD']);
 
