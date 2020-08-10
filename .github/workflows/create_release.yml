@@ -49,7 +49,7 @@ jobs:
             });
 
             const plainVersion = newVersion.slice(1); // remove the leading 'v'
-            const artifactName = `Desktop.Starter-${plainVersion}-win.zip`;
+            const artifactName = `Desktop Starter-${plainVersion}-win.zip`;
             const artifactPath = `./dist/${artifactName}`;
             await runWithOpts('github.repos.uploadReleaseAsset', {
                 owner: context.repo.owner,
