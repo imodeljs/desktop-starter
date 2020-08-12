@@ -7,7 +7,7 @@ jobs:
   create_release:
     name: Windows Release
     runs-on: windows-latest
-    if: ${{ startsWith(github.event.pull_request.title, '[Bump Version] ') }}
+    if: ${{ startsWith(github.event.pull_request.title, '[Bump Version] ') && github.event.pull_request.merged }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
