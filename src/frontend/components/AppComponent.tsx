@@ -82,10 +82,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   private initializeAutoOpen() {
-    // If a snapshot is configured in .env.local, then use for auto-opening at startup
-    try {
-      this.snapshotName = Config.App.get("imjs_offline_imodel");
-    } catch (e) { }
+    // First, check the command line.
+    let argv = (this.getRemote().process.argv as string[]).slice(1); // trim leading EXE name
+    if (this.getRemote().process.env.NODE_ENV === "development") // dev launches electron EXE with its own runtime args, need to skip them
+      argv = argv.slice(1 + argv.findIndex((a) => a.includes("main.js")));
+    if (argv.length > 0)
+      this.snapshotName = argv[0];
+
+    // Then try app configraiton (e.g. .env.local)
+    if (!this.snapshotName) {
+      try {
+        this.snapshotName = Config.App.get("imjs_offline_imodel");
+      } catch (e) { }
+    }
 
     // If no snapshot, check if a project/iModel is configured
     if (!this.snapshotName) {
