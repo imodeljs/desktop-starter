@@ -18,6 +18,7 @@ Logger.initializeToConsole();
 Logger.setLevelDefault(LogLevel.Warning);
 Logger.setLevel(AppLoggerCategory.Frontend, LogLevel.Info);
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   // Start the app.
   await App.startup();
@@ -27,4 +28,4 @@ Logger.setLevel(AppLoggerCategory.Frontend, LogLevel.Info);
     <AppComponent />,
     document.getElementById("root") as HTMLElement,
   );
-})(); // tslint:disable-line:no-floating-promises
+})();
