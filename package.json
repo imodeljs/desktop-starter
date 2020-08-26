@@ -114,6 +114,9 @@
       "react": {
         "version": "detect"
       }
+    },
+    "rules": {
+      "react/jsx-key": "warn"
     }
   }
 }
