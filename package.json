@@ -34,15 +34,7 @@
     "build:dist": "electron-builder"
   },
   "browserslist": [
-    "electron 6.0.0",
-    "last 4 chrome version",
-    "last 4 firefox version",
-    "last 4 safari version",
-    "last 4 ios version",
-    "last 4 ChromeAndroid version",
-    "last 4 edge version",
-    "not dead",
-    "not <0.2%"
+    "electron 8.3.4"
   ],
   "dependencies": {
     "@bentley/backend-itwin-client": "^2.6.0",
