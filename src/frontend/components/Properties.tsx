@@ -3,18 +3,10 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
-import ReactResizeDetector from "react-resize-detector";
-
 import { IModelConnection } from "@bentley/imodeljs-frontend";
-import {
-  PresentationPropertyDataProvider, propertyGridWithUnifiedSelection,
-} from "@bentley/presentation-components";
-import { PropertyGrid } from "@bentley/ui-components";
-import { Orientation, useDisposable } from "@bentley/ui-core";
-
-// create a HOC property grid component that supports unified selection
-// tslint:disable-next-line:variable-name
-const SimplePropertyGrid = propertyGridWithUnifiedSelection(PropertyGrid);
+import { PresentationPropertyDataProvider, usePropertyDataProviderWithUnifiedSelection } from "@bentley/presentation-components";
+import { FillCentered, Orientation, useDisposable } from "@bentley/ui-core";
+import { VirtualizedPropertyGridWithDataProvider } from "@bentley/ui-components";
 
 /** React properties for the property grid component */
 export interface Props {
@@ -25,21 +17,22 @@ export interface Props {
 }
 
 /** Property grid component for the viewer app */
-export default function SimplePropertiesComponent(props: Props) {
+export default function SimplePropertiesComponent(props: Props) { // eslint-disable-line @typescript-eslint/naming-convention
   const dataProvider = useDisposable(React.useCallback(() => new PresentationPropertyDataProvider({ imodel: props.imodel }), [props.imodel]));
-  return (
-    <ReactResizeDetector handleWidth>
-      {(width: number) => {
-        // Switch to Vertical if width too small
-        const orientation = (width > 340) ? props.orientation : Orientation.Vertical;
+  const { isOverLimit } = usePropertyDataProviderWithUnifiedSelection({ dataProvider });
+  let content: JSX.Element;
+  if (isOverLimit) {
+    content = (<FillCentered>{"Too many elements."}</FillCentered>);
+  } else {
+    content = (<VirtualizedPropertyGridWithDataProvider
+      dataProvider={dataProvider}
+      isPropertyHoverEnabled={true}
+      orientation={Orientation.Horizontal}
+      horizontalOrientationMinWidth={500}
+    />);
+  }
 
-        return (
-          <SimplePropertyGrid
-            orientation={orientation}
-            dataProvider={dataProvider}
-          />
-        );
-      }}
-    </ReactResizeDetector>
+  return (
+    content
   );
 }

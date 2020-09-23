@@ -11,6 +11,7 @@ import {
 } from "@bentley/ui-framework";
 
 import { App } from "../../app/App";
+/* eslint-disable react/jsx-key */
 
 class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {

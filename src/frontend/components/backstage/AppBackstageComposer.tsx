@@ -27,6 +27,7 @@ interface AppBackstageComposerProps {
   userInfo: UserInfo | undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function AppBackstageComposerComponent({ userInfo }: AppBackstageComposerProps) {
   const [backstageItems] = React.useState(() => [
     BackstageItemUtilities.createActionItem("SelectIModel", 100, 30, () => App.store.dispatch({ type: "App:SELECT_IMODEL" }),
@@ -43,4 +44,4 @@ export function AppBackstageComposerComponent({ userInfo }: AppBackstageComposer
   );
 }
 
-export const AppBackstageComposer = connect(mapStateToProps)(AppBackstageComposerComponent); // tslint:disable-line:variable-name
+export const AppBackstageComposer = connect(mapStateToProps)(AppBackstageComposerComponent); // eslint-disable-line @typescript-eslint/naming-convention
