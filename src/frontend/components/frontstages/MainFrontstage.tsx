@@ -12,6 +12,7 @@ import {
 
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 import { AppStatusBarWidget } from "../widgets/statusbar/AppStatusBar";
+/* eslint-disable react/jsx-key */
 
 /**
  * Main Frontstage

@@ -45,6 +45,7 @@ async function initialize(rpcs: RpcInterfaceDefinition[]) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
     // Initialize iModelHost
@@ -61,4 +62,4 @@ async function initialize(rpcs: RpcInterfaceDefinition[]) {
     Logger.logError(AppLoggerCategory.Backend, error);
     process.exitCode = 1;
   }
-})(); // tslint:disable-line:no-floating-promises
+})();
