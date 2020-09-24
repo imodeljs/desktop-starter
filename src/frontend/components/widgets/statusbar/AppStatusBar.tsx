@@ -12,22 +12,27 @@ import {
 } from "@bentley/ui-framework";
 import { FooterSeparator } from "@bentley/ui-ninezone";
 
-const ToolAssistance = withStatusFieldProps(ToolAssistanceField); // tslint:disable-line: variable-name
-const MessageCenter = withMessageCenterFieldProps(MessageCenterField); // tslint:disable-line: variable-name
-const Sections = withStatusFieldProps(SectionsStatusField); // tslint:disable-line: variable-name
-const SelectionScope = withStatusFieldProps(SelectionScopeField); // tslint:disable-line: variable-name
-const FooterOnlyDisplay = withStatusFieldProps(FooterModeField); // tslint:disable-line: variable-name
+/* eslint-disable @typescript-eslint/naming-convention */
+const ToolAssistance = withStatusFieldProps(ToolAssistanceField);
+const MessageCenter = withMessageCenterFieldProps(MessageCenterField);
+const Sections = withStatusFieldProps(SectionsStatusField);
+const SelectionScope = withStatusFieldProps(SelectionScopeField);
+const FooterOnlyDisplay = withStatusFieldProps(FooterModeField);
+/* eslint-enable @typescript-eslint/naming-convention */
 
 /**
  * Status Bar widget control
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class AppStatusBarWidget extends StatusBarWidgetControl {
   private _statusBarItems?: StatusBarItem[];
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   private get footerModeOnlySeparator(): React.ReactNode {
     return (<FooterOnlyDisplay> <FooterSeparator /> </FooterOnlyDisplay>);
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   private get statusBarItems(): StatusBarItem[] {
     if (!this._statusBarItems) {
       const statusBarItems: StatusBarItem[] = [];

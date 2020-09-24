@@ -35,7 +35,7 @@ const initialState: SwitchIModelState = {
   selectedSnapshot: "",
 };
 
-// tslint:disable-next-line:variable-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SwitchIModelActions = {
   selectIModel: () => createAction("App:SELECT_IMODEL", {}),
   selectSnapshot: () => createAction("App:SELECT_SNAPSHOT", {}),
@@ -45,6 +45,7 @@ export const SwitchIModelActions = {
 
 export type SwitchIModelActionsUnion = ActionsUnion<typeof SwitchIModelActions>;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 function AppReducer(state: SwitchIModelState = initialState, action: SwitchIModelActionsUnion): DeepReadonly<SwitchIModelState> {
   switch (action.type) {
     case "App:SELECT_IMODEL":

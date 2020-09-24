@@ -13,6 +13,7 @@ import {
 } from "@bentley/ui-framework";
 
 import { App } from "../../app/App";
+/* eslint-disable react/jsx-key */
 
 class SnapshotSelectControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {

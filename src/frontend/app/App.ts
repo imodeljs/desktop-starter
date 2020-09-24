@@ -75,7 +75,7 @@ export class App {
 
     const clientId = Config.App.getString("imjs_electron_test_client_id");
     const redirectUri = Config.App.getString("imjs_electron_test_redirect_uri");
-    const oidcConfiguration: DesktopAuthorizationClientConfiguration = { clientId, redirectUri, scope: scope + " offline_access" };
+    const oidcConfiguration: DesktopAuthorizationClientConfiguration = { clientId, redirectUri, scope: `${scope} offline_access` };
     const desktopClient = new DesktopAuthorizationClient(oidcConfiguration);
     await desktopClient.initialize(new ClientRequestContext());
     IModelApp.authorizationClient = desktopClient;
