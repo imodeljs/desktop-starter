@@ -2,11 +2,11 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
+import { assert, ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
 import {
-  DesktopAuthorizationClientConfiguration, ElectronRpcManager,
+  DesktopAuthorizationClientConfiguration, ElectronRpcManager, getIModelElectronApi, IModelElectronApi
 } from "@bentley/imodeljs-common";
 import {
   DesktopAuthorizationClient, IModelApp, IModelAppOptions,
@@ -16,13 +16,15 @@ import {
   AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework,
 } from "@bentley/ui-framework";
 
-import { getSupportedRpcs } from "../../common/rpcs";
+import { getSupportedRpcs, ViewerConfig, appIpc } from "../../common/rpcs";
 import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
 import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
 import { AppState, AppStore } from "./AppState";
 
 export class App {
+  private static _ipcApi: IModelElectronApi;
   private static _appState: AppState;
+  public static config: ViewerConfig;
 
   public static get oidcClient(): FrontendAuthorizationClient { return IModelApp.authorizationClient as FrontendAuthorizationClient; }
 
@@ -35,6 +37,11 @@ export class App {
     opts.notifications = new AppNotificationManager();
 
     await IModelApp.startup(opts);
+
+    this._ipcApi = getIModelElectronApi()!;
+    assert(this._ipcApi !== undefined);
+
+    this.config = await this._ipcApi.invoke(appIpc("getConfig"));
 
     // initialize OIDC
     await App.initializeOidc();
