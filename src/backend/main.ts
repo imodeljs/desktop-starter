@@ -5,7 +5,7 @@
 import { dialog, ipcMain } from "electron";
 import * as path from "path";
 import * as minimist from "minimist";
-import { assert, Logger, LogLevel } from "@bentley/bentleyjs-core";
+import { Logger, LogLevel } from "@bentley/bentleyjs-core";
 import { ElectronManagerOptions, IModelJsElectronManager, WebpackDevServerElectronManager } from "@bentley/electron-manager";
 import { ApplicationType, IModelHost, IModelHostConfiguration } from "@bentley/imodeljs-backend";
 import { ElectronRpcManager } from "@bentley/imodeljs-common";
