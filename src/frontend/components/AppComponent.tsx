@@ -6,7 +6,6 @@
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import "./AppComponent.css";
 
-import * as path from "path";
 import * as React from "react";
 import { Provider } from "react-redux";
 
@@ -82,7 +81,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   private initializeAutoOpen() {
-    // Then try app configraiton (e.g. .env.local)
+    // Then try app configuration (e.g. .env.local)
     if (!this._snapshotName) {
       try {
         this._snapshotName = Config.App.get("imjs_offline_imodel");
@@ -103,7 +102,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         // If nothing was configured, then open the default snapshot
         if (!this._projectName || !this._imodelName) {
           if (!this._snapshotName)
-            this._snapshotName = this.getDefaultSnapshot();
+            this._snapshotName = App.config.sampleiModelPath;
         }
       }
     }
@@ -165,17 +164,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
     window.localStorage.setItem("imjs_offline_imodel", "");
     window.localStorage.setItem("imjs_test_project", "");
     window.localStorage.setItem("imjs_test_imodel", "");
-  }
-
-  private getRemote(): any {
-    return require("electron").remote;
-  }
-
-  private getDefaultSnapshot(): string {
-    let assetsPath = "assets";
-    if (this.getRemote().app.isPackaged)
-      assetsPath = path.join(this.getRemote().app.getAppPath(), "build", "assets").replace("app.asar", "app.asar.unpacked");
-    return path.join(assetsPath, "Baytown.bim");
   }
 
   public componentDidMount() {
@@ -342,7 +330,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   private _handleOpenSnapshot = async () => {
 
     if (!this._snapshotName)
-      this._snapshotName = this.getDefaultSnapshot();
+      this._snapshotName = App.config.sampleiModelPath;
 
     let imodel: IModelConnection | undefined;
     try {

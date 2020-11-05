@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { dialog, ipcMain } from "electron";
+import { dialog, ipcMain, app } from "electron";
 import * as path from "path";
 import * as minimist from "minimist";
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
@@ -23,10 +23,23 @@ const getAppEnvVar = (varName: string): string | undefined => process.env[`${app
 
 // create the config object to send to the frontend
 const getFrontendConfig = (): ViewerConfig => {
-  const parsedArgs = minimist(process.argv.slice(2)); // first two arguments are .exe name and the path to ViewerMain.js. Skip them.
+  // first two arguments are .exe name and the path to ViewerMain.js. Skip them.
+  const parsedArgs = process.env.NODE_ENV === "development"
+    ? minimist(process.argv.slice(2 + process.argv.findIndex((a: string) => a.includes("main.js"))))
+    : minimist(process.argv.slice(1));
+
+  const samplePath = app.isPackaged
+    ? path.join(app.getAppPath(), "build", "assets").replace("app.asar", "app.asar.unpacked")
+    : path.join("assets", "Baytown.bim");
+
   const iModel = getAppEnvVar("IMODEL");
   const name = getAppEnvVar("PROJECT");
+
+  Logger.logInfo(AppLoggerCategory.Backend, `Command line arg: ${process.argv}`);
+  Logger.logInfo(AppLoggerCategory.Backend, `Command line args: ${parsedArgs._[0]}`);
+
   return {
+    sampleiModelPath: samplePath,
     snapshotName: parsedArgs._[0] ?? getAppEnvVar("SNAPSHOT"),
     clientId: getAppEnvVar("CLIENT_ID") ?? appInfo.id,
     redirectUri: getAppEnvVar("REDIRECT_URI") ?? `http://localhost:3000/signin-callback`,

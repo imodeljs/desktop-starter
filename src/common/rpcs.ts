@@ -12,6 +12,7 @@ export const appIpc = (name: string) => `imodeljs.viewer.${name}`;
 
 export interface ViewerConfig {
   snapshotName?: string;
+  sampleiModelPath: string;
   project?: {
     iModel: string;
     name: string;
