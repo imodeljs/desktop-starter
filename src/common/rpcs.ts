@@ -8,6 +8,19 @@ import {
 } from "@bentley/imodeljs-common";
 import { PresentationRpcInterface } from "@bentley/presentation-common";
 
+export const appIpc = (name: string) => `imodeljs.viewer.${name}`;
+
+export interface ViewerConfig {
+  snapshotName?: string;
+  sampleiModelPath: string;
+  project?: {
+    iModel: string;
+    name: string;
+  };
+  clientId: string;
+  redirectUri: string;
+}
+
 /**
  * Returns a list of RPCs supported by this application
  */
