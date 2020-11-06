@@ -35,9 +35,6 @@ const getFrontendConfig = (): ViewerConfig => {
   const iModel = getAppEnvVar("IMODEL");
   const name = getAppEnvVar("PROJECT");
 
-  Logger.logInfo(AppLoggerCategory.Backend, `Command line arg: ${process.argv}`);
-  Logger.logInfo(AppLoggerCategory.Backend, `Command line args: ${parsedArgs._[0]}`);
-
   return {
     sampleiModelPath: samplePath,
     snapshotName: parsedArgs._[0] ?? getAppEnvVar("SNAPSHOT"),
