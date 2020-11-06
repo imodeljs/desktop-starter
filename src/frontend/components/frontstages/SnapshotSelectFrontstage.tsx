@@ -4,6 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
 
+import { assert } from "@bentley/bentleyjs-core";
 import { OpenDialogOptions, OpenDialogReturnValue } from "electron";
 import { getIModelElectronApi } from "@bentley/imodeljs-common";
 import { IModelApp } from "@bentley/imodeljs-frontend";
@@ -76,12 +77,6 @@ export class SnapshotSelectFrontstage extends FrontstageProvider {
 class LocalFilePage extends React.Component {
   private _input: HTMLInputElement | null = null;
 
-  // public componentDidMount() {
-  //   if (this._input) {
-  //     this._clickInput();
-  //   }
-  // }
-
   private _clickInput = async () => {
     const options: OpenDialogOptions = {
       // title: App.translate("snapshotSelect.open"),
@@ -90,7 +85,7 @@ class LocalFilePage extends React.Component {
     };
 
     const api = getIModelElectronApi();
-    // assert(api !== undefined);
+    assert(api !== undefined);
     const val = (await api!.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
     const file = val.canceled ? undefined : val.filePaths[0];
     if (file) {

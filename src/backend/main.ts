@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { dialog, ipcMain, app } from "electron";
+import { app, dialog, ipcMain } from "electron";
 import * as path from "path";
 import * as minimist from "minimist";
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
