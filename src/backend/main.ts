@@ -83,7 +83,7 @@ const initialize = async () =>  {
   }
 
   // register handlers for viewer's IPC methods.
-  ipcMain.handleOnce(appIpc("getConfig"), async () => getFrontendConfig()); // may only be called once
+  ipcMain.handleOnce(appIpc("getConfig"), async () => getFrontendConfig());
   ipcMain.handle(appIpc("openFile"), async (_event: any, options: any) => dialog.showOpenDialog(options));
 }
 
