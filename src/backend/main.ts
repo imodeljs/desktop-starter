@@ -41,8 +41,8 @@ const getFrontendConfig = (): ViewerConfig => {
     clientId: getAppEnvVar("CLIENT_ID") ?? appInfo.id,
     redirectUri: getAppEnvVar("REDIRECT_URI") ?? `http://localhost:3000/signin-callback`,
     project: (name && iModel) ? { iModel, name } : undefined,
-  }
-}
+  };
+};
 
 /**
  * Initializes Electron backend
@@ -85,7 +85,7 @@ const initialize = async () =>  {
   // register handlers for viewer's IPC methods.
   ipcMain.handle(appIpc("getConfig"), async () => getFrontendConfig());
   ipcMain.handle(appIpc("openFile"), async (_event: any, options: any) => dialog.showOpenDialog(options));
-}
+};
 
 try {
   initialize(); // eslint-disable-line @typescript-eslint/no-floating-promises
