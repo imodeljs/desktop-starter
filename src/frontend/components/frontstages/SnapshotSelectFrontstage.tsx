@@ -86,7 +86,7 @@ class LocalFilePage extends React.Component {
 
     const api = getIModelElectronApi();
     assert(api !== undefined);
-    const val = (await api!.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
+    const val = (await api.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
     const file = val.canceled ? undefined : val.filePaths[0];
     if (file) {
       try {
@@ -94,7 +94,7 @@ class LocalFilePage extends React.Component {
       } catch (e) {
       }
     }
-  }
+  };
 
   private _handleChange = async (_e: React.ChangeEvent) => {
     if (this._input) {
@@ -109,7 +109,7 @@ class LocalFilePage extends React.Component {
         }
       }
     }
-  }
+  };
 
   public render() {
     const title = IModelApp.i18n.translate("App:snapshotSelect.title");
