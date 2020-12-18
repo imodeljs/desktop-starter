@@ -190,19 +190,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  }
+  };
 
   private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  }
+  };
 
   private _onOffline = async () => {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  }
+  };
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
@@ -262,7 +262,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       alert(e.message);
       this.doReselectOnError();
     }
-  }
+  };
 
   private doReselectOnError() {
     if (this._wantSnapshot)
@@ -325,10 +325,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
-  }
+  };
 
   private _handleOpenSnapshot = async () => {
-
     if (!this._snapshotName)
       this._snapshotName = App.config.sampleiModelPath;
 
@@ -344,7 +343,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
 
     await this._onIModelOpened(imodel);
-  }
+  };
 
   private _handleOpenImodel = async () => {
     if (!this._projectName || !this._imodelName) {
@@ -385,7 +384,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     const imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);
     await this._onIModelOpened(imodel);
-  }
+  };
 }
 
 /** Renders a viewport and a property grid */

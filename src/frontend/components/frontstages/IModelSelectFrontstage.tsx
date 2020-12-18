@@ -24,7 +24,7 @@ class IModelSelectorControl extends ContentControl {
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
 
     App.store.dispatch({type: "App:OPEN_IMODEL", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
-  }
+  };
 }
 
 export class IModelSelectFrontstage extends FrontstageProvider {
