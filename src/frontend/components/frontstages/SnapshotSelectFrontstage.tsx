@@ -4,6 +4,9 @@
 *--------------------------------------------------------------------------------------------*/
 import * as React from "react";
 
+import { assert } from "@bentley/bentleyjs-core";
+import { OpenDialogOptions, OpenDialogReturnValue } from "electron";
+import { getIModelElectronApi } from "@bentley/imodeljs-common";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Button, ButtonSize, ButtonType, FillCentered, Headline } from "@bentley/ui-core";
 import {
@@ -13,6 +16,7 @@ import {
 } from "@bentley/ui-framework";
 
 import { App } from "../../app/App";
+import { appIpc } from "../../../common/rpcs";
 /* eslint-disable react/jsx-key */
 
 class SnapshotSelectControl extends ContentControl {
@@ -73,17 +77,24 @@ export class SnapshotSelectFrontstage extends FrontstageProvider {
 class LocalFilePage extends React.Component {
   private _input: HTMLInputElement | null = null;
 
-  public componentDidMount() {
-    if (this._input) {
-      this._clickInput();
-    }
-  }
+  private _clickInput = async () => {
+    const options: OpenDialogOptions = {
+      // title: App.translate("snapshotSelect.open"),
+      properties: ["openFile"],
+      filters: [{ name: "iModels", extensions: ["ibim", "bim"] }],
+    };
 
-  private _clickInput = () => {
-    if (this._input) {
-      this._input.click();
+    const api = getIModelElectronApi();
+    assert(api !== undefined);
+    const val = (await api.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
+    const file = val.canceled ? undefined : val.filePaths[0];
+    if (file) {
+      try {
+        App.store.dispatch({ type: "App:OPEN_SNAPSHOT", payload: file });
+      } catch (e) {
+      }
     }
-  }
+  };
 
   private _handleChange = async (_e: React.ChangeEvent) => {
     if (this._input) {
@@ -91,14 +102,14 @@ class LocalFilePage extends React.Component {
         const file: File = this._input.files[0];
         if (file) {
           try {
-            App.store.dispatch({type: "App:OPEN_SNAPSHOT", payload: file.path});
+            App.store.dispatch({type: "App:OPEN_SNAPSHOT", payload: file });
           } catch (e) {
             alert(e.message);
           }
         }
       }
     }
-  }
+  };
 
   public render() {
     const title = IModelApp.i18n.translate("App:snapshotSelect.title");

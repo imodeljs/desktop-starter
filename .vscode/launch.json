@@ -14,32 +14,39 @@
   ],
   "configurations": [
     {
-      "type": "node",
-      "request": "launch",
       "name": "Main",
-      "protocol": "inspector",
+      "presentation": {
+        "hidden": true
+      },
+      "type": "pwa-node",
+      "request": "launch",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
-        "--remote-debugging-port=9223",
-        "${workspaceFolder}/lib/backend/main.js"
+        "${workspaceFolder}/lib/backend/main.js",
+        "--remote-debugging-port=9223"
       ],
       "env": {
         "NODE_ENV": "development"
       },
-      "windows": {
-        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-      },
-      "args": [
-        // "C:\\Temp\\t1\\a.bim"
+      "autoAttachChildProcesses": false,
+      "attachSimplePort": 0,
+      "outputCapture": "std",
+      "cascadeTerminateToConfigurations": [
+        "Renderer"
       ]
     },
     {
       "name": "Renderer",
-      "type": "chrome",
+      "presentation": {
+        "hidden": true
+      },
+      "type": "pwa-chrome",
       "request": "attach",
       "port": 9223,
       "webRoot": "${workspaceFolder}/build/",
-      "timeout": 30000
+      "cascadeTerminateToConfigurations": [
+        "Main"
+      ]
     }
   ]
 }

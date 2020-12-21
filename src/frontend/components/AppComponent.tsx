@@ -6,7 +6,6 @@
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import "./AppComponent.css";
 
-import * as path from "path";
 import * as React from "react";
 import { Provider } from "react-redux";
 
@@ -82,14 +81,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   private initializeAutoOpen() {
-    // First, check the command line.
-    let argv = (this.getRemote().process.argv as string[]).slice(1); // trim leading EXE name
-    if (this.getRemote().process.env.NODE_ENV === "development") // dev launches electron EXE with its own runtime args, need to skip them
-      argv = argv.slice(1 + argv.findIndex((a) => a.includes("main.js")));
-    if (argv.length > 0)
-      this._snapshotName = argv[0];
-
-    // Then try app configraiton (e.g. .env.local)
+    // Then try app configuration (e.g. .env.local)
     if (!this._snapshotName) {
       try {
         this._snapshotName = Config.App.get("imjs_offline_imodel");
@@ -110,7 +102,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         // If nothing was configured, then open the default snapshot
         if (!this._projectName || !this._imodelName) {
           if (!this._snapshotName)
-            this._snapshotName = this.getDefaultSnapshot();
+            this._snapshotName = App.config.sampleiModelPath;
         }
       }
     }
@@ -174,17 +166,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
     window.localStorage.setItem("imjs_test_imodel", "");
   }
 
-  private getRemote(): any {
-    return require("electron").remote;
-  }
-
-  private getDefaultSnapshot(): string {
-    let assetsPath = "assets";
-    if (this.getRemote().app.isPackaged)
-      assetsPath = path.join(this.getRemote().app.getAppPath(), "build", "assets").replace("app.asar", "app.asar.unpacked");
-    return path.join(assetsPath, "Baytown.bim");
-  }
-
   public componentDidMount() {
     App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
     // Make sure user is signed in before attempting to open an iModel
@@ -209,19 +190,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  }
+  };
 
   private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  }
+  };
 
   private _onOffline = async () => {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  }
+  };
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
@@ -281,7 +262,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       alert(e.message);
       this.doReselectOnError();
     }
-  }
+  };
 
   private doReselectOnError() {
     if (this._wantSnapshot)
@@ -344,12 +325,11 @@ export default class AppComponent extends React.Component<{}, AppState> {
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
-  }
+  };
 
   private _handleOpenSnapshot = async () => {
-
     if (!this._snapshotName)
-      this._snapshotName = this.getDefaultSnapshot();
+      this._snapshotName = App.config.sampleiModelPath;
 
     let imodel: IModelConnection | undefined;
     try {
@@ -363,7 +343,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
 
     await this._onIModelOpened(imodel);
-  }
+  };
 
   private _handleOpenImodel = async () => {
     if (!this._projectName || !this._imodelName) {
@@ -404,7 +384,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     const imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);
     await this._onIModelOpened(imodel);
-  }
+  };
 }
 
 /** Renders a viewport and a property grid */
