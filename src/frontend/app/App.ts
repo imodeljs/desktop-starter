@@ -72,9 +72,8 @@ export class App {
 
   public static async initializeOidc() {
     const scope = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party";
-
-    const clientId = Config.App.getString("imjs_electron_test_client_id");
-    const redirectUri = Config.App.getString("imjs_electron_test_redirect_uri");
+    const clientId = Config.App.getString("IMJS_ELECTRON_TEST_CLIENT_ID");
+    const redirectUri = Config.App.getString("IMJS_ELECTRON_TEST_REDIRECT_URI");
     const oidcConfiguration: DesktopAuthorizationClientConfiguration = { clientId, redirectUri, scope: `${scope} offline_access` };
     const desktopClient = new DesktopAuthorizationClient(oidcConfiguration);
     await desktopClient.initialize(new ClientRequestContext());
