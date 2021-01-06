@@ -31,8 +31,8 @@ import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
-  projectName: string | null;
-  imodelName: string | null;
+  contextId: string | null;
+  imodelId: string | null;
 }
 
 /** React state of the App component */
@@ -54,11 +54,11 @@ export default class AppComponent extends React.Component<{}, AppState> {
   private get _snapshotName(): string | null { return this._autoOpenConfig.snapshotName; }
   private set _snapshotName(value: string | null) { this._autoOpenConfig.snapshotName = value; }
 
-  private get _projectId(): string | null { return this._autoOpenConfig.projectName; }
-  private set _projectId(value: string | null) { this._autoOpenConfig.projectName = value; }
+  private get _contextId(): string | null { return this._autoOpenConfig.contextId; }
+  private set _contextId(value: string | null) { this._autoOpenConfig.contextId = value; }
 
-  private get _imodelId(): string | null { return this._autoOpenConfig.imodelName; }
-  private set _imodelId(value: string | null) { this._autoOpenConfig.imodelName = value; }
+  private get _imodelId(): string | null { return this._autoOpenConfig.imodelId; }
+  private set _imodelId(value: string | null) { this._autoOpenConfig.imodelId = value; }
 
   /** Creates an App instance */
   constructor(props?: any, context?: any) {
@@ -72,7 +72,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       isOpening: false,
     };
 
-    this._autoOpenConfig = { snapshotName: null, projectName: null, imodelName: null };
+    this._autoOpenConfig = { snapshotName: null, contextId: null, imodelId: null };
     this._isAutoOpen = true;
     this._wantSnapshot = true;
 
@@ -88,19 +88,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } catch (e) { }
     }
 
-    // If no snapshot, check if a project/iModel is configured
+    // If no snapshot, check if a context/iModel is configured
     if (!this._snapshotName) {
       try {
         this._imodelId = Config.App.get("IMJS_IMODEL_ID");
-        this._projectId = Config.App.get("IMJS_CONTEXT_ID", this._imodelId as string);
+        this._contextId = Config.App.get("IMJS_CONTEXT_ID", this._imodelId as string);
       } catch (e) { }
 
-      // Check if we cached a snapshot or project/iModel to reopen
-      if (!this._projectId || !this._imodelId) {
+      // Check if we cached a snapshot or context/iModel to reopen
+      if (!this._contextId || !this._imodelId) {
         this.loadAutoOpenConfig();
 
         // If nothing was configured, then open the default snapshot
-        if (!this._projectId || !this._imodelId) {
+        if (!this._contextId || !this._imodelId) {
           if (!this._snapshotName)
             this._snapshotName = App.config.sampleiModelPath;
         }
@@ -126,7 +126,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else if (switchState === SwitchState.OpenIModel) {
         const selectedIModel = App.store.getState().switchIModelState.selectedIModel;
         if (selectedIModel) {
-          this._projectId = selectedIModel.projectId;
+          this._contextId = selectedIModel.contextId;
           this._imodelId = selectedIModel.imodelId;
           this._snapshotName = null;
           this._wantSnapshot = false;
@@ -136,7 +136,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         const selectedSnapshot: string = App.store.getState().switchIModelState.selectedSnapshot;
         if (selectedSnapshot) {
           this._snapshotName = selectedSnapshot;
-          this._projectId = null;
+          this._contextId = null;
           this._imodelId = null;
           this._wantSnapshot = true;
           await this._handleOpen();
@@ -145,21 +145,21 @@ export default class AppComponent extends React.Component<{}, AppState> {
     });
   }
 
-  // Load the recently opened snapshot, project, and iModel names.
+  // Load the recently opened snapshot, context, and iModel names.
   private loadAutoOpenConfig() {
     this._snapshotName = window.localStorage.getItem("IMJS_OFFLINE_IMODEL");
-    this._projectId = window.localStorage.getItem("IMJS_CONTEXT_ID");
+    this._contextId = window.localStorage.getItem("IMJS_CONTEXT_ID");
     this._imodelId = window.localStorage.getItem("IMJS_IMODEL_ID");
   }
 
-  // Save the recently opened snapshot, project, and iModel names.
+  // Save the recently opened snapshot, context, and iModel names.
   private saveAutoOpenConfig() {
     window.localStorage.setItem("IMJS_OFFLINE_IMODEL", this._snapshotName ? this._snapshotName : "");
-    window.localStorage.setItem("IMJS_CONTEXT_ID", this._projectId ? this._projectId : "");
+    window.localStorage.setItem("IMJS_CONTEXT_ID", this._contextId ? this._contextId : "");
     window.localStorage.setItem("IMJS_IMODEL_ID", this._imodelId ? this._imodelId : "");
   }
 
-  // Clear snapshot, project, and iModel names in config.
+  // Clear snapshot, context, and iModel names in config.
   private clearAutoOpenConfig() {
     window.localStorage.setItem("IMJS_OFFLINE_IMODEL", "");
     window.localStorage.setItem("IMJS_CONTEXT_ID", "");
@@ -249,7 +249,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
         await FrontstageManager.setActiveFrontstageDef(frontstageProvider.frontstageDef);
 
-        // Cache name of snapshot or imodel/project that was opened for auto-open in next session
+        // Cache name of snapshot or imodel/context that was opened for auto-open in next session
         this.saveAutoOpenConfig();
       } else {
         // If we failed to find a viewState, then we will just close the imodel and allow the user to select a different shapshot/iModel
@@ -366,7 +366,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   };
 
   private _handleOpenImodel = async () => {
-    if (!this._projectId || !this._imodelId) {
+    if (!this._contextId || !this._imodelId) {
       this.setState({ isOpening: false });
       return;
     }
@@ -377,7 +377,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       const version = await this.getVersion(this._imodelId);
       // else create a new connection
       const imodel = await RemoteBriefcaseConnection.open(
-        this._projectId,
+        this._contextId,
         this._imodelId,
         OpenMode.Readonly,
         version
@@ -386,7 +386,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(
-        `Error opening the iModel: ${this._imodelId} in Project: ${this._projectId}`,
+        `Error opening the iModel: ${this._imodelId} in Context: ${this._contextId}`,
         error
       );
       throw error;

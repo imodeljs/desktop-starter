@@ -23,7 +23,7 @@ class IModelSelectorControl extends ContentControl {
   // called when an imodel has been selected on the IModelSelect
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
 
-    App.store.dispatch({ type: "App:OPEN_IMODEL", payload: { projectId: iModelInfo.projectInfo.wsgId, imodelId: iModelInfo.wsgId } });
+    App.store.dispatch({ type: "App:OPEN_IMODEL", payload: { contextId: iModelInfo.projectInfo.wsgId, imodelId: iModelInfo.wsgId } });
   };
 }
 

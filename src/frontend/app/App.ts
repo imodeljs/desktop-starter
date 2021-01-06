@@ -63,7 +63,7 @@ export class App {
     // initialize the ConfigurableUiManager
     ConfigurableUiManager.initialize();
 
-    // Create a FrontStage where we can select a project/iModel.
+    // Create a FrontStage where we can select a context/iModel.
     FrontstageManager.addFrontstageProvider(new IModelSelectFrontstage());
 
     // Create a FrontStage where we can select a snapshot.
