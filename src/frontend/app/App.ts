@@ -5,17 +5,18 @@
 import { assert, ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { DesktopAuthorizationClientConfiguration, ElectronRpcManager, getIModelElectronApi, IModelElectronApi } from "@bentley/imodeljs-common";
+import { ElectronFrontend, ElectronFrontendOptions, } from "@bentley/electron-manager/lib/ElectronFrontend";
+import { DesktopAuthorizationClientConfiguration } from "@bentley/imodeljs-common";
 import { DesktopAuthorizationClient, IModelApp, IModelAppOptions } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
-import { appIpc, getSupportedRpcs, ViewerConfig } from "../../common/rpcs";
+import { getSupportedRpcs, ViewerConfig } from "../../common/rpcs";
 import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
 import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
 import { AppState, AppStore } from "./AppState";
 
 export class App {
-  private static _ipcApi: IModelElectronApi;
+  public static ipcApi: ElectronFrontend;
   private static _appState: AppState;
   public static config: ViewerConfig;
 
@@ -31,19 +32,20 @@ export class App {
 
     await IModelApp.startup(opts);
 
-    this._ipcApi = getIModelElectronApi()!;
-    assert(this._ipcApi !== undefined);
-
-    this.config = await this._ipcApi.invoke(appIpc("getConfig"));
-
-    // initialize OIDC
-    await App.initializeOidc();
-
     // initialize Presentation
     await Presentation.initialize({ activeLocale: IModelApp.i18n.languageList()[0] });
 
+    const electronFrontendOpts: ElectronFrontendOptions = {
+      rpcInterfaces: getSupportedRpcs(),
+    }
+
     // initialize RPC communication
-    ElectronRpcManager.initializeClient({}, getSupportedRpcs());
+    this.ipcApi = ElectronFrontend.initialize(electronFrontendOpts);
+
+    assert(this.ipcApi !== undefined);
+
+    // initialize OIDC
+    await App.initializeOidc();
 
     // initialize localization for the app
     await IModelApp.i18n.registerNamespace("App").readFinished;

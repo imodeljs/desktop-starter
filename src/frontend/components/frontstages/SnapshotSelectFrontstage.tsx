@@ -6,7 +6,6 @@ import * as React from "react";
 
 import { assert } from "@bentley/bentleyjs-core";
 import { OpenDialogOptions, OpenDialogReturnValue } from "electron";
-import { getIModelElectronApi } from "@bentley/imodeljs-common";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Button, ButtonSize, ButtonType, FillCentered, Headline } from "@bentley/ui-core";
 import {
@@ -84,9 +83,8 @@ class LocalFilePage extends React.Component {
       filters: [{ name: "iModels", extensions: ["ibim", "bim"] }],
     };
 
-    const api = getIModelElectronApi();
-    assert(api !== undefined);
-    const val = (await api.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
+    assert(App.ipcApi !== undefined);
+    const val = (await App.ipcApi.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
     const file = val.canceled ? undefined : val.filePaths[0];
     if (file) {
       try {

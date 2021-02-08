@@ -6,9 +6,8 @@ import { app, dialog, ipcMain } from "electron";
 import * as path from "path";
 import * as minimist from "minimist";
 import { Logger, LogLevel } from "@bentley/bentleyjs-core";
-import { ElectronManagerOptions, IModelJsElectronManager, WebpackDevServerElectronManager } from "@bentley/electron-manager";
+import { ElectronBackend, ElectronBackendOptions } from "@bentley/electron-manager/lib/ElectronBackend";
 import { ApplicationType, IModelHost, IModelHostConfiguration } from "@bentley/imodeljs-backend";
-import { ElectronRpcManager } from "@bentley/imodeljs-common";
 import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
 import { appIpc, getSupportedRpcs, ViewerConfig } from "../common/rpcs";
@@ -61,16 +60,15 @@ const initialize = async () =>  {
   // Initialize Presentation
   Presentation.initialize();
 
-  // Initialize ElectronRpcManager with correct RPC interfaces
-  ElectronRpcManager.initializeImpl({}, getSupportedRpcs());
-
-  const opts: ElectronManagerOptions = {
+  const opts: ElectronBackendOptions = {
     webResourcesPath: path.join(__dirname, "..", "..", "build"),
+    rpcInterfaces: getSupportedRpcs(),
+    developmentServer: (process.env.NODE_ENV === "development") ? true : false
   };
 
-  const manager = (process.env.NODE_ENV === "development") ? new WebpackDevServerElectronManager(opts) : new IModelJsElectronManager(opts);
+  const manager = ElectronBackend.initialize(opts);
 
-  await manager.initialize({
+  await manager.openMainWindow({
     width: 1280,
     height: 800,
     show: false,
