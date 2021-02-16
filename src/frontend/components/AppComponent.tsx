@@ -286,7 +286,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline}/>);
+      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
@@ -308,7 +308,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-      if (App.oidcClient.isAuthorized || currentIModelConnection.isSnapshot )
+      if (App.oidcClient.isAuthorized || currentIModelConnection.isSnapshot)
         await currentIModelConnection.close();
       UiFramework.setIModelConnection(undefined);
     }
@@ -337,7 +337,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       imodel = await SnapshotConnection.openFile(this._snapshotName);
     } catch (e) {
       this.setState({ isOpening: false });
-      await IModelApp.notifications.openMessageBox(MessageBoxType.Ok, IModelApp.i18n.translate("App:errorOpenSnapshot", {snapshotName: this._snapshotName, e}), MessageBoxIconType.Critical);
+      await IModelApp.notifications.openMessageBox(MessageBoxType.Ok, IModelApp.i18n.translate("App:errorOpenSnapshot", { snapshotName: this._snapshotName, e }), MessageBoxIconType.Critical);
       this.doReselectOnError();
       return;
     }
@@ -382,6 +382,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       return;
     }
 
+    // eslint-disable-next-line deprecation/deprecation
     const imodel = await RemoteBriefcaseConnection.open(project.wsgId, imodels[0].wsgId, OpenMode.Readonly);
     await this._onIModelOpened(imodel);
   };
