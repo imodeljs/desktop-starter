@@ -17,9 +17,9 @@ export interface ViewerConfig {
 }
 
 // ipc channel name for this application
-export const dtsChannel = "dts";
+export const desktopStarterChannel = "desktop-starter";
 // Ipc interface for this application.
-export interface DtsInterface {
+export interface DesktopStarterInterface {
   getConfig: () => Promise<ViewerConfig>;
 }
 

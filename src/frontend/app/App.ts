@@ -10,7 +10,7 @@ import { DesktopAuthorizationClientConfiguration } from "@bentley/imodeljs-commo
 import { AsyncMethodsOf, DesktopAuthorizationClient, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
-import { dtsChannel, DtsInterface, getRpcInterfaces, ViewerConfig } from "../../common/ViewerProps";
+import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../../common/ViewerProps";
 import { IModelSelectFrontstage } from "../components/frontstages/IModelSelectFrontstage";
 import { SnapshotSelectFrontstage } from "../components/frontstages/SnapshotSelectFrontstage";
 import { AppState, AppStore } from "./AppState";
@@ -22,8 +22,8 @@ export class App {
   public static get oidcClient(): FrontendAuthorizationClient { return IModelApp.authorizationClient as FrontendAuthorizationClient; }
 
   public static get store(): AppStore { return this._appState.store; }
-  public static async callMyBackend<T extends AsyncMethodsOf<DtsInterface>>(methodName: T, ...args: Parameters<DtsInterface[T]>) {
-    return IpcApp.callIpcChannel(dtsChannel, methodName, ...args) as PromiseReturnType<DtsInterface[T]>;
+  public static async callMyBackend<T extends AsyncMethodsOf<DesktopStarterInterface>>(methodName: T, ...args: Parameters<DesktopStarterInterface[T]>) {
+    return IpcApp.callIpcChannel(desktopStarterChannel, methodName, ...args) as PromiseReturnType<DesktopStarterInterface[T]>;
   };
 
   public static async startup(): Promise<void> {

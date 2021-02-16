@@ -8,19 +8,19 @@ import { Logger, LogLevel } from "@bentley/bentleyjs-core";
 import { ElectronHost } from "@bentley/electron-manager/lib/ElectronBackend";
 import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
-import { dtsChannel, DtsInterface, getRpcInterfaces, ViewerConfig } from "../common/ViewerProps";
+import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../common/ViewerProps";
 import { IpcHandler } from "@bentley/imodeljs-backend";
 
 const appInfo = {
   id: "app",
-  title: "Desktop Start",
+  title: "Desktop Starter",
   envPrefix: "app_",
 };
 
 const getAppEnvVar = (varName: string): string | undefined => process.env[`${appInfo.envPrefix}${varName}`];
 
-class DtsHandler extends IpcHandler implements DtsInterface {
-  public get channelName() { return dtsChannel; }
+class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterface {
+  public get channelName() { return desktopStarterChannel; }
   public async getConfig(): Promise<ViewerConfig> {
     // first two arguments are .exe name and the path to ViewerMain.js. Skip them.
     const parsedArgs = process.env.NODE_ENV === "development"
@@ -58,7 +58,7 @@ const initialize = async () => {
     electronHost: {
       webResourcesPath: path.join(__dirname, "..", "..", "build"),
       rpcInterfaces: getRpcInterfaces(),
-      ipcHandlers: [DtsHandler],
+      ipcHandlers: [DesktopStarterHandler],
       developmentServer: process.env.NODE_ENV === "development",
     },
   };
