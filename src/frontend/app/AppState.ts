@@ -3,10 +3,7 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 import { combineReducers, createStore, Store } from "redux";
-
-import {
-  ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState,
-} from "@bentley/ui-framework";
+import { ActionsUnion, createAction, DeepReadonly, FrameworkReducer, FrameworkState } from "@bentley/ui-framework";
 
 // Valid values for SwitchIModelState.switchState
 export enum SwitchState {

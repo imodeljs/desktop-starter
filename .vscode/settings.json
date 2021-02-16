@@ -1,20 +1,91 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-  "editor.detectIndentation": false,
-  "editor.insertSpaces": true,
   "editor.tabSize": 2,
-  "editor.trimAutoWhitespace": true,
-  "files.exclude": {
-    "**/lib/**": false,
-    "**/node_modules/**": false,
-    "**/*.TileCache*": true,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.nyc_output": true,
+    "**/.rush": true
   },
+  "files.exclude": {
+    "**/.nyc_output": true,
+    "**/.rush": true,
+    "**/*.build.log": true,
+    "**/*.build.error.log": true,
+    "**/generated-docs": true,
+    "**/package-deps.json": true,
+    "**/node_modules": true,
+    "**/test-apps/**/build": true,
+    "**/out": true,
+    "**/lib": true,
+    "common/temp": true
+  },
+  "files.trimTrailingWhitespace": true,
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "files.associations": {
+    "*.snap": "javascript",
+    ".nycrc": "json",
+    "certa.json": "jsonc"
+  },
+  "cSpell.enableFiletypes": [
+    "c",
+    "cpp",
+    "csharp",
+    "go",
+    "html",
+    "javascript",
+    "javascriptreact",
+    "latex",
+    "markdown",
+    "php",
+    "plaintext",
+    "python",
+    "text",
+    "typescript",
+    "typescriptreact",
+    "xml",
+    "yml"
+  ],
+  "editor.detectIndentation": false,
+  "editor.trimAutoWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
-  "files.trimTrailingWhitespace": true,
-  "cSpell.words": [
-    "BACKSTAGESHOW",
-    "backstagehide",
-    "imodels"
-  ]
+  "importSorter.importStringConfiguration.quoteMark": "double",
+  "importSorter.generalConfiguration.sortImportsInDirectory": false,
+  "importSorter.generalConfiguration.sortOnBeforeSave": false,
+  "importSorter.importStringConfiguration.trailingComma": "multiLine",
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 150,
+  "importSorter.importStringConfiguration.tabSize": 2,
+  "importSorter.sortConfiguration.removeUnusedImports": true,
+  "importSorter.sortConfiguration.customOrderingRules.rules": [
+    {
+      "type": "importMember",
+      "regex": "^$",
+      "orderLevel": 5,
+      "disableSort": true
+    },
+    {
+      "regex": "^[^.@]",
+      "orderLevel": 10
+    },
+    {
+      "regex": "^[@]",
+      "orderLevel": 15
+    },
+    {
+      "regex": "^[.]",
+      "orderLevel": 30
+    }
+  ],
+  "importSorter.sortConfiguration.customOrderingRules.defaultNumberOfEmptyLinesAfterGroup": 0,
+  "debug.internalConsoleOptions": "openOnSessionStart",
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.markdownlint": true, // first run the markdown linter
+    "editor.action.fixAll": true, // Run the default formatter before eslint, it handles whitespace better
+    "source.fixAll.eslint": true // then run ESLint auto-fix
+  }
 }
