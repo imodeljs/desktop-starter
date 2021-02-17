@@ -24,7 +24,7 @@ export class App {
   public static get store(): AppStore { return this._appState.store; }
   public static async callMyBackend<T extends AsyncMethodsOf<DesktopStarterInterface>>(methodName: T, ...args: Parameters<DesktopStarterInterface[T]>) {
     return IpcApp.callIpcChannel(desktopStarterChannel, methodName, ...args) as PromiseReturnType<DesktopStarterInterface[T]>;
-  };
+  }
 
   public static async startup(): Promise<void> {
 
