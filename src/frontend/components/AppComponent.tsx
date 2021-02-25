@@ -9,13 +9,12 @@ import "./AppComponent.css";
 import * as React from "react";
 import { Provider } from "react-redux";
 
-import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
+import { Config, Id64 } from "@bentley/bentleyjs-core";
 import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
 import { IModelVersion } from "@bentley/imodeljs-common";
 import {
-  CheckpointConnection,
-  FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
-  RemoteBriefcaseConnection, SnapshotConnection, ViewState,
+  CheckpointConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
+  SnapshotConnection, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { AuthorizedClientRequestContext } from "@bentley/itwin-client";
 import { SignIn } from "@bentley/ui-components";
