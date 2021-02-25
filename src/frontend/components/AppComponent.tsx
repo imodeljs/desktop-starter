@@ -13,6 +13,7 @@ import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
 import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
 import { IModelVersion } from "@bentley/imodeljs-common";
 import {
+  CheckpointConnection,
   FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
   RemoteBriefcaseConnection, SnapshotConnection, ViewState,
 } from "@bentley/imodeljs-frontend";
@@ -375,11 +376,11 @@ export default class AppComponent extends React.Component<{}, AppState> {
     try {
       // get the version to query
       const version = await this.getVersion(this._imodelId);
-      // else create a new connection
-      const imodel = await RemoteBriefcaseConnection.open(
+      // create a new connection
+      const imodel: CheckpointConnection = await CheckpointConnection.openRemote(
         this._contextId,
         this._imodelId,
-        OpenMode.Readonly,
+        version
       );
       await this._onIModelOpened(imodel);
     } catch (error) {
