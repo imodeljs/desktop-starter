@@ -362,12 +362,12 @@ export default class AppComponent extends React.Component<{}, AppState> {
   };
 
   // get the local filename for the "pullOnly" briefcase for the current iModelId
-  private async getReadonlyBriefcase(): Promise<string> {
+  private async getPullOnlyBriefcase(): Promise<string> {
     const iModelId = this._imodelId!;
     const briefcases = await NativeApp.getCachedBriefcases(iModelId);
     for (const briefcase of briefcases) {
       if (briefcase.briefcaseId === BriefcaseIdValue.Standalone) // this is the briefcaseId for "pullOnly"
-        return briefcase.fileName;
+        return briefcase.fileName; // we already have it.
     }
     // TODO:  add progress indicator with cancel button
     const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly })
@@ -383,7 +383,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._snapshotName = null;
 
     try {
-      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getReadonlyBriefcase(), readonly: true });
+      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
 
       // TODO: Check if briefcase changesetId and see if we need to pull changes. If so, call briefcase.pullAndMergeChange();
 
