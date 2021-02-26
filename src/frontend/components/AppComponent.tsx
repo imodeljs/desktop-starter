@@ -9,9 +9,10 @@ import * as React from "react";
 import { Provider } from "react-redux";
 import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
 import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
+import { BriefcaseIdValue } from "@bentley/imodeljs-backend";
 import { IModelVersion, SyncMode } from "@bentley/imodeljs-common";
 import {
-  BriefcaseConnection, CheckpointConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
+  BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { AuthorizedClientRequestContext } from "@bentley/itwin-client";
 import { SignIn } from "@bentley/ui-components";
@@ -24,7 +25,6 @@ import { App } from "../app/App";
 import { SwitchState } from "../app/AppState";
 import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
-import { BriefcaseIdValue } from "@bentley/imodeljs-backend";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -187,19 +187,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  };
+  }
 
   private async _onStartSignin() {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  };
+  }
 
   private async _onOffline() {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  };
+  }
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
@@ -259,7 +259,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       alert(e.message);
       this.doReselectOnError();
     }
-  };
+  }
 
   private doReselectOnError() {
     if (this._wantSnapshot)
@@ -322,7 +322,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
-  };
+  }
 
   private async _handleOpenSnapshot() {
     if (!this._snapshotName)
@@ -340,7 +340,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
 
     await this._onIModelOpened(imodel);
-  };
+  }
 
   /** determine the proper version of the iModel to open
    * 1. If named versions exist, get the named version that contains the latest changeset
@@ -359,7 +359,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         : IModelVersion.latest();
     }
     return IModelVersion.latest();
-  };
+  }
 
   // get the local filename for the "pullOnly" briefcase for the current iModelId
   private async getPullOnlyBriefcase(): Promise<string> {
@@ -370,7 +370,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
         return briefcase.fileName; // we already have it.
     }
     // TODO:  add progress indicator with cancel button
-    const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly })
+    const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly });
     await download.downloadPromise;
     return download.fileName;
   }
@@ -393,7 +393,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       console.error(`Error opening iModel: ${error.message}`);
       throw error;
     }
-  };
+  }
 }
 
 /** Renders a viewport and a property grid */
