@@ -361,17 +361,18 @@ export default class AppComponent extends React.Component<{}, AppState> {
     return IModelVersion.latest();
   };
 
+  // get the local filename for the "pullOnly" briefcase for the current iModelId
   private async getReadonlyBriefcase(): Promise<string> {
     const iModelId = this._imodelId!;
     const briefcases = await NativeApp.getCachedBriefcases(iModelId);
     for (const briefcase of briefcases) {
-      if (briefcase.briefcaseId === BriefcaseIdValue.Standalone)
+      if (briefcase.briefcaseId === BriefcaseIdValue.Standalone) // this is the briefcaseId for "pullOnly"
         return briefcase.fileName;
     }
     // TODO:  add progress indicator with cancel button
-    const bc = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly })
-    await bc.downloadPromise;
-    return bc.fileName;
+    const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly })
+    await download.downloadPromise;
+    return download.fileName;
   }
 
   private async _handleOpenImodel() {
