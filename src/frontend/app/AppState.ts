@@ -18,8 +18,8 @@ export enum SwitchState {
 }
 
 export interface SelectedIModel {
-  imodelName: string;
-  projectName: string;
+  imodelId: string;
+  contextId: string;
 }
 
 // State handling for switching iModels

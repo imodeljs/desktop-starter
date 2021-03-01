@@ -3,8 +3,8 @@
   "opening": "Opening",
   "noViewDefinition": "No valid view definitions in iModel",
   "errorOpenSnapshot": "Error opening snapshot: {{snapshotName}} -- {{e}}",
-  "noIModel": "iModel with name {{imodelName}} does not exist in project {{projectName}}",
-  "noProject": "Project with name {{projectName}} does not exist",
+  "noIModel": "iModel with name {{imodelName}} does not exist in context {{contextName}}, or the signed in user does not have access.",
+  "noContext": "Context with name {{contextName}} does not exist, or the signed in user does not have access.",
   "components": {
     "properties": "Properties"
   },

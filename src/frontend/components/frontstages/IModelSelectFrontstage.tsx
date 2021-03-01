@@ -17,13 +17,13 @@ class IModelSelectorControl extends ContentControl {
   constructor(info: ConfigurableCreateInfo, options: any) {
     super(info, options);
 
-    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel}/>;
+    this.reactNode = <IModelSelector onIModelSelected={this._onSelectIModel} />;
   }
 
   // called when an imodel has been selected on the IModelSelect
   private _onSelectIModel = async (iModelInfo: IModelInfo) => {
 
-    App.store.dispatch({type: "App:OPEN_IMODEL", payload: {projectName: iModelInfo.projectInfo.name, imodelName: iModelInfo.name}});
+    App.store.dispatch({ type: "App:OPEN_IMODEL", payload: { contextId: iModelInfo.projectInfo.wsgId, imodelId: iModelInfo.wsgId } });
   };
 }
 
@@ -58,7 +58,7 @@ export class IModelSelectFrontstage extends FrontstageProvider {
         contentManipulationTools={
           <Zone
             widgets={[
-              <Widget isFreeform={true} element={<ToolWidgetComposer cornerItem={<BackstageAppButton/>}/>} />,
+              <Widget isFreeform={true} element={<ToolWidgetComposer cornerItem={<BackstageAppButton />} />} />,
             ]}
           />
         }
