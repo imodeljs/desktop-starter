@@ -9,7 +9,6 @@ import * as React from "react";
 import { Provider } from "react-redux";
 import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
 import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
-import { BriefcaseIdValue } from "@bentley/imodeljs-backend";
 import { IModelVersion, SyncMode } from "@bentley/imodeljs-common";
 import {
   BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
@@ -366,7 +365,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const iModelId = this._imodelId!;
     const briefcases = await NativeApp.getCachedBriefcases(iModelId);
     for (const briefcase of briefcases) {
-      if (briefcase.briefcaseId === BriefcaseIdValue.Standalone) // this is the briefcaseId for "pullOnly"
+      if (briefcase.briefcaseId === 0) // this is the briefcaseId for "pullOnly"
         return briefcase.fileName; // we already have it.
     }
     // TODO:  add progress indicator with cancel button
