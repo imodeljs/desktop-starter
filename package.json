@@ -19,7 +19,7 @@
   "scripts": {
     "build": "run-p build:backend build:frontend copy",
     "build:backend": "tsc -p tsconfig.backend.json",
-    "build:frontend": "cross-env EXTEND_ESLINT=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build:frontend": "cross-env DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
     "clean": "rimraf lib build dist",
     "copy": "npm run copy:assets && npm run copy:enUS",
     "copy:assets": "cpx \"./assets/*\" ./build/assets/",
@@ -28,7 +28,7 @@
     "electron:debug": "cross-env NODE_ENV=development electron lib/backend/main.js",
     "lint": "eslint --config package.json --no-eslintrc \"./src/**/*.{ts,tsx}\" 1>&2",
     "start": "npm run build:backend && run-p \"start:frontend\" \"electron:debug\"",
-    "start:frontend": "cross-env BROWSER=none EXTEND_ESLINT=true react-scripts start",
+    "start:frontend": "cross-env BROWSER=none DISABLE_ESLINT=true USE_FAST_SASS=true TRANSPILE_DEPS=false react-scripts start",
     "build:pack": "electron-builder --dir",
     "build:dist": "electron-builder"
   },
@@ -78,7 +78,7 @@
   "devDependencies": {
     "@bentley/build-tools": "^2.13.0-dev.22",
     "@bentley/eslint-plugin": "^2.13.0-dev.22",
-    "@bentley/react-scripts": "3.4.6",
+    "@bentley/react-scripts": "3.4.9",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/minimist": "^1.2.0",
     "@types/react": "^16.14.4",
@@ -95,7 +95,7 @@
     "npm-run-all": "^4.1.5",
     "rimraf": "^2.6.2",
     "sass": "^1.29.0",
-    "typescript": "^4.1.0",
+    "typescript": "~4.1.0",
     "webpack": "4.42.0"
   },
   "eslintConfig": {
