@@ -347,7 +347,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       if (briefcase.briefcaseId === 0) // this is the briefcaseId for "pullOnly"
         return briefcase.fileName; // we already have it.
     }
-    // TODO:  add progress indicator with cancel button
+
     const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly });
     await download.downloadPromise;
     return download.fileName;
@@ -362,9 +362,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     try {
       const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
-
-      // TODO: Check if briefcase changesetId and see if we need to pull changes. If so, call briefcase.pullAndMergeChange();
-
       await this._onIModelOpened(briefcase);
     } catch (error) {
       // eslint-disable-next-line no-console
