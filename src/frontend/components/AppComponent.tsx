@@ -184,19 +184,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  };
+  }
 
   private async _onStartSignin() {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  };
+  }
 
   private async _onOffline() {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  };
+  }
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
