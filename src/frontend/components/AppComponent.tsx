@@ -8,12 +8,10 @@ import "./AppComponent.css";
 import * as React from "react";
 import { Provider } from "react-redux";
 import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
-import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
-import { IModelVersion, SyncMode } from "@bentley/imodeljs-common";
+import { SyncMode } from "@bentley/imodeljs-common";
 import {
   BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
 } from "@bentley/imodeljs-frontend";
-import { AuthorizedClientRequestContext } from "@bentley/itwin-client";
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import {
@@ -178,7 +176,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     App.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
-  private _onUserStateChanged() {
+  private _onUserStateChanged = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
       if (this.state.user.isAuthorized) {
         if (this._isAutoOpen)
@@ -186,19 +184,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  }
+  };
 
-  private async _onStartSignin() {
+  private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  }
+  };
 
-  private async _onOffline() {
+  private _onOffline = async () => {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  }
+  };
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
@@ -339,25 +337,6 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
 
     await this._onIModelOpened(imodel);
-  }
-
-  /** determine the proper version of the iModel to open
-   * 1. If named versions exist, get the named version that contains the latest changeset
-   * 2. If no named version exists, return the latest changeset
-   */
-  private async getVersion(): Promise<IModelVersion> {
-    const token = await IModelApp.authorizationClient?.getAccessToken();
-    if (token) {
-      const requestContext = new AuthorizedClientRequestContext(token);
-      const hubClient = new IModelHubClient();
-      const namedVersions = await hubClient.versions.get(requestContext, this._imodelId!, new VersionQuery().top(1));
-      // if there is a named version (version with the latest changeset "should" be at the top), return the version as of its changeset
-      // otherwise return the version as of the latest changeset
-      return namedVersions.length === 1 && namedVersions[0].changeSetId
-        ? IModelVersion.asOfChangeSet(namedVersions[0].changeSetId)
-        : IModelVersion.latest();
-    }
-    return IModelVersion.latest();
   }
 
   // get the local filename for the "pullOnly" briefcase for the current iModelId
