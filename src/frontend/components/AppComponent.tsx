@@ -161,7 +161,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
+    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged, this);
     // Make sure user is signed in before attempting to open an iModel
     if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
@@ -176,7 +176,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     App.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
-  private _onUserStateChanged = async () => {
+  private async _onUserStateChanged() {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
       if (this.state.user.isAuthorized) {
         if (this._isAutoOpen)
@@ -186,12 +186,12 @@ export default class AppComponent extends React.Component<{}, AppState> {
     });
   };
 
-  private _onStartSignin = async () => {
+  private async _onStartSignin() {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
   };
 
-  private _onOffline = async () => {
+  private async _onOffline() {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
@@ -280,7 +280,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline} />);
+      ui = (<SignIn onSignIn={async () => this._onStartSignin} onOffline={async () => this._onOffline} />); // note: must capture "this"
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
