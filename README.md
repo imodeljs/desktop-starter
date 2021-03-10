@@ -1,10 +1,10 @@
 # Desktop Starter
 
-Copyright © Bentley Systems, Inc.
+Copyright © Bentley Systems, Incorporated. All rights reserved. See [LICENSE.md](./LICENSE.md) for license terms and full copyright notice.
 
-The purpose of this app is to serve as a desktop starter to be copied by a developer.
+The purpose of this repository is to serve as starting point for developers wishing to create an iTwin.js Electron app.
 
-See <https://itwinjs.org> for comprehensive documentation on the iModel.js API and the various constructs used in this app.
+See <https://itwinjs.org> for comprehensive documentation on the iTwin.js API and the various constructs used in this app.
 
 ![App Screenshot](./docs/header.png)
 
@@ -32,4 +32,4 @@ These variables must be updated before deployment, but the supplied defaults can
 
 ## Contributing
 
-[Contributing to iModel.js](https://github.com/imodeljs/imodeljs/blob/master/CONTRIBUTING.md)
+[Contributing to iTwin.js](https://github.com/imodeljs/imodeljs/blob/master/CONTRIBUTING.md)

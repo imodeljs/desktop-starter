@@ -18,7 +18,7 @@ jobs:
           git config --global user.name "imodeljs-admin[bot]"
         name: git config
       - run: npm ci
-      - run: npx run-s lint build:prod build:dist
+      - run: npx run-s lint build build:dist
       - uses: actions/github-script@v2
         name: create release
         with:

@@ -5,25 +5,19 @@
 // make sure webfont brings in the icons and css files.
 import "@bentley/icons-generic-webfont/dist/bentley-icons-generic-webfont.css";
 import "./AppComponent.css";
-
 import * as React from "react";
 import { Provider } from "react-redux";
-
-import { Config, Id64, OpenMode } from "@bentley/bentleyjs-core";
-import { IModelHubClient, VersionQuery } from "@bentley/imodelhub-client";
-import { IModelVersion } from "@bentley/imodeljs-common";
+import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
+import { SyncMode } from "@bentley/imodeljs-common";
 import {
-  FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType,
-  RemoteBriefcaseConnection, SnapshotConnection, ViewState,
+  BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
 } from "@bentley/imodeljs-frontend";
-import { AuthorizedClientRequestContext } from "@bentley/itwin-client";
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import {
-  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider,
-  SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext, UiFramework,
+  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext,
+  UiFramework,
 } from "@bentley/ui-framework";
-
 import { App } from "../app/App";
 import { SwitchState } from "../app/AppState";
 import { MainFrontstage } from "../components/frontstages/MainFrontstage";
@@ -54,11 +48,11 @@ export default class AppComponent extends React.Component<{}, AppState> {
   private get _snapshotName(): string | null { return this._autoOpenConfig.snapshotName; }
   private set _snapshotName(value: string | null) { this._autoOpenConfig.snapshotName = value; }
 
-  private get _contextId(): string | null { return this._autoOpenConfig.contextId; }
-  private set _contextId(value: string | null) { this._autoOpenConfig.contextId = value; }
+  private get _contextId(): GuidString | null { return this._autoOpenConfig.contextId; }
+  private set _contextId(value: GuidString | null) { this._autoOpenConfig.contextId = value; }
 
-  private get _imodelId(): string | null { return this._autoOpenConfig.imodelId; }
-  private set _imodelId(value: string | null) { this._autoOpenConfig.imodelId = value; }
+  private get _imodelId(): GuidString | null { return this._autoOpenConfig.imodelId; }
+  private set _imodelId(value: GuidString | null) { this._autoOpenConfig.imodelId = value; }
 
   /** Creates an App instance */
   constructor(props?: any, context?: any) {
@@ -167,7 +161,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged);
+    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged, this);
     // Make sure user is signed in before attempting to open an iModel
     if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
@@ -182,7 +176,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     App.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
-  private _onUserStateChanged = () => {
+  private async _onUserStateChanged() {
     this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
       if (this.state.user.isAuthorized) {
         if (this._isAutoOpen)
@@ -190,19 +184,19 @@ export default class AppComponent extends React.Component<{}, AppState> {
       } else
         this.clearAutoOpenConfig();
     });
-  };
+  }
 
-  private _onStartSignin = async () => {
+  private async _onStartSignin() {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     await App.oidcClient.signIn(new FrontendRequestContext());
-  };
+  }
 
-  private _onOffline = async () => {
+  private async _onOffline() {
     this._wantSnapshot = true;
     const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
-  };
+  }
 
   /** Pick the first available spatial, orthographic or drawing view definition in the iModel */
   private async getFirstViewDefinition(imodel: IModelConnection): Promise<ViewState | null> {
@@ -226,7 +220,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   /** Handle iModel open event */
-  private _onIModelOpened = async (imodel: IModelConnection | undefined) => {
+  private async _onIModelOpened(imodel?: IModelConnection) {
     this.setState({ isOpening: false });
     if (!imodel) {
       UiFramework.setIModelConnection(undefined);
@@ -262,7 +256,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       alert(e.message);
       this.doReselectOnError();
     }
-  };
+  }
 
   private doReselectOnError() {
     if (this._wantSnapshot)
@@ -286,7 +280,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline} />);
+      ui = (<SignIn onSignIn={async () => this._onStartSignin} onOffline={async () => this._onOffline} />); // note: must capture "this"
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
@@ -314,7 +308,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
   }
 
-  private _handleOpen = async () => {
+  private async _handleOpen() {
     this._isAutoOpen = false;
     this.setState({ isOpening: true });
 
@@ -325,16 +319,16 @@ export default class AppComponent extends React.Component<{}, AppState> {
       return this._handleOpenSnapshot();
 
     return this._handleOpenImodel();
-  };
+  }
 
-  private _handleOpenSnapshot = async () => {
+  private async _handleOpenSnapshot() {
     if (!this._snapshotName)
       this._snapshotName = App.config.sampleiModelPath;
 
     let imodel: IModelConnection | undefined;
     try {
       // attempt to open the imodel
-      imodel = await SnapshotConnection.openFile(this._snapshotName);
+      imodel = await BriefcaseConnection.openFile({ fileName: this._snapshotName, readonly: true });
     } catch (e) {
       this.setState({ isOpening: false });
       await IModelApp.notifications.openMessageBox(MessageBoxType.Ok, IModelApp.i18n.translate("App:errorOpenSnapshot", { snapshotName: this._snapshotName, e }), MessageBoxIconType.Critical);
@@ -343,29 +337,23 @@ export default class AppComponent extends React.Component<{}, AppState> {
     }
 
     await this._onIModelOpened(imodel);
-  };
+  }
 
-  /** determine the proper version of the iModel to open
-   * 1. If named versions exist, get the named version that contains the latest changeset
-   * 2. If no named version exists, return the latest changeset
-   */
-  private getVersion = async (iModelId: string): Promise<IModelVersion> => {
-    const token = await IModelApp.authorizationClient?.getAccessToken();
-    if (token) {
-      const requestContext = new AuthorizedClientRequestContext(token);
-      const hubClient = new IModelHubClient();
-      const namedVersions = await hubClient.versions.get(requestContext, iModelId, new VersionQuery().top(1)
-      );
-      // if there is a named version (version with the latest changeset "should" be at the top), return the version as of its changeset
-      // otherwise return the version as of the latest changeset
-      return namedVersions.length === 1 && namedVersions[0].changeSetId
-        ? IModelVersion.asOfChangeSet(namedVersions[0].changeSetId)
-        : IModelVersion.latest();
+  // get the local filename for the "pullOnly" briefcase for the current iModelId
+  private async getPullOnlyBriefcase(): Promise<string> {
+    const iModelId = this._imodelId!;
+    const briefcases = await NativeApp.getCachedBriefcases(iModelId);
+    for (const briefcase of briefcases) {
+      if (briefcase.briefcaseId === 0) // this is the briefcaseId for "pullOnly"
+        return briefcase.fileName; // we already have it.
     }
-    return IModelVersion.latest();
-  };
 
-  private _handleOpenImodel = async () => {
+    const download = await NativeApp.requestDownloadBriefcase(this._contextId!, iModelId, { syncMode: SyncMode.PullOnly });
+    await download.downloadPromise;
+    return download.fileName;
+  }
+
+  private async _handleOpenImodel() {
     if (!this._contextId || !this._imodelId) {
       this.setState({ isOpening: false });
       return;
@@ -373,25 +361,14 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._snapshotName = null;
 
     try {
-      // get the version to query
-      const version = await this.getVersion(this._imodelId);
-      // else create a new connection
-      const imodel = await RemoteBriefcaseConnection.open(
-        this._contextId,
-        this._imodelId,
-        OpenMode.Readonly,
-        version
-      );
-      await this._onIModelOpened(imodel);
+      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
+      await this._onIModelOpened(briefcase);
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(
-        `Error opening the iModel: ${this._imodelId} in Context: ${this._contextId}`,
-        error
-      );
+      console.error(`Error opening iModel: ${error.message}`);
       throw error;
     }
-  };
+  }
 }
 
 /** Renders a viewport and a property grid */

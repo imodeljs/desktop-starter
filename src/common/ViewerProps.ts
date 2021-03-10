@@ -2,13 +2,8 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import {
-  IModelReadRpcInterface, IModelTileRpcInterface, RpcInterfaceDefinition,
-  SnapshotIModelRpcInterface,
-} from "@bentley/imodeljs-common";
+import { IModelReadRpcInterface, IModelTileRpcInterface, RpcInterfaceDefinition, SnapshotIModelRpcInterface } from "@bentley/imodeljs-common";
 import { PresentationRpcInterface } from "@bentley/presentation-common";
-
-export const appIpc = (name: string) => `imodeljs.viewer.${name}`;
 
 export interface ViewerConfig {
   snapshotName?: string;
@@ -21,10 +16,15 @@ export interface ViewerConfig {
   redirectUri: string;
 }
 
-/**
- * Returns a list of RPCs supported by this application
- */
-export function getSupportedRpcs(): RpcInterfaceDefinition[] {
+// ipc channel name for this application
+export const desktopStarterChannel = "desktop-starter";
+// Ipc interface for this application.
+export interface DesktopStarterInterface {
+  getConfig: () => Promise<ViewerConfig>;
+}
+
+/* Returns a list of RPCs required by this application */
+export function getRpcInterfaces(): RpcInterfaceDefinition[] {
   return [
     IModelReadRpcInterface,
     IModelTileRpcInterface,
