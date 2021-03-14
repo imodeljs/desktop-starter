@@ -7,7 +7,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
     "moduleResolution": "node",
