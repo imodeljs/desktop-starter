@@ -6,8 +6,8 @@ import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { ElectronApp } from "@bentley/electron-manager/lib/ElectronFrontend";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { DesktopAuthorizationClientConfiguration } from "@bentley/imodeljs-common";
-import { AsyncMethodsOf, DesktopAuthorizationClient, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
+import { NativeAppAuthorizationConfiguration } from "@bentley/imodeljs-common";
+import { AsyncMethodsOf, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
 import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../../common/ViewerProps";
@@ -27,6 +27,7 @@ export class App {
   }
 
   public static async startup(): Promise<void> {
+    const authConfig: NativeAppAuthorizationConfiguration = this.getAuthConfig();
 
     await ElectronApp.startup({
       iModelApp: {
@@ -34,12 +35,12 @@ export class App {
         notifications: new AppNotificationManager(), // Use the AppNotificationManager subclass from ui-framework to get prompts and messages
         rpcInterfaces: getRpcInterfaces(),
       },
+      nativeApp: {
+        authConfig,
+      },
     });
 
     this.config = await this.callMyBackend("getConfig");
-
-    // initialize OIDC
-    await App.initializeOidc();
 
     // initialize Presentation
     await Presentation.initialize({ activeLocale: IModelApp.i18n.languageList()[0] });
@@ -69,13 +70,14 @@ export class App {
     FrontstageManager.addFrontstageProvider(new SnapshotSelectFrontstage());
   }
 
-  public static async initializeOidc() {
-    const scope = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access";
-    const clientId = Config.App.getString("IMJS_ELECTRON_TEST_CLIENT_ID");
+  public static getAuthConfig(): NativeAppAuthorizationConfiguration {
     const redirectUri = Config.App.getString("IMJS_ELECTRON_TEST_REDIRECT_URI");
-    const oidcConfiguration: DesktopAuthorizationClientConfiguration = { clientId, redirectUri, scope };
-    const desktopClient = new DesktopAuthorizationClient(oidcConfiguration);
-    await desktopClient.initialize(new ClientRequestContext());
-    IModelApp.authorizationClient = desktopClient;
+    const scope = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access";
+
+    return {
+      clientId: "imodeljs-electron-test",
+      redirectUri,
+      scope,
+    };
   }
 }

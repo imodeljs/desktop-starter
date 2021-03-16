@@ -22,6 +22,7 @@ import { App } from "../app/App";
 import { SwitchState } from "../app/AppState";
 import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
+import { AccessToken } from "@bentley/itwin-client";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -60,7 +61,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     this.state = {
       user: {
-        isAuthorized: App.oidcClient.isAuthorized,
+        isAuthorized: IModelApp.authorizationClient!.isAuthorized,
         isLoading: false,
       },
       isOpening: false,
@@ -161,7 +162,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged, this);
+    IModelApp.authorizationClient!.onUserStateChanged.addListener(this._onUserStateChanged, this);
     // Make sure user is signed in before attempting to open an iModel
     if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
@@ -173,22 +174,39 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     this._subscription.unsubscribe();
-    App.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
+    IModelApp.authorizationClient!.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
-  private async _onUserStateChanged() {
-    this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
+  private _onUserStateChanged = () => {
+    this.setState((prev) => ({
+      user: {
+        ...prev.user,
+        isAuthorized: IModelApp.authorizationClient!.isAuthorized,
+        isLoading: false
+      }
+    }), async () => {
       if (this.state.user.isAuthorized) {
-        if (this._isAutoOpen)
+        if (this._isAutoOpen) {
           await this._handleOpen();
-      } else
+        }
+      } else {
         this.clearAutoOpenConfig();
+      }
     });
   }
 
-  private async _onStartSignin() {
+  private _onStartSignin = async () => {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
-    await App.oidcClient.signIn(new FrontendRequestContext());
+    const auth = IModelApp.authorizationClient!;
+    if (auth.isAuthorized) {
+      return true;
+    }
+
+    return new Promise<boolean>((resolve, reject) => {
+      auth.onUserStateChanged.addOnce((token?: AccessToken) =>
+        resolve(token !== undefined));
+      auth.signIn().catch((err) => reject(err));
+    });
   }
 
   private async _onOffline() {
@@ -220,7 +238,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   /** Handle iModel open event */
-  private async _onIModelOpened(imodel?: IModelConnection) {
+  private _onIModelOpened = async (imodel?: IModelConnection) => {
     this.setState({ isOpening: false });
     if (!imodel) {
       UiFramework.setIModelConnection(undefined);
@@ -280,7 +298,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={async () => this._onStartSignin} onOffline={async () => this._onOffline} />); // note: must capture "this"
+      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
@@ -302,7 +320,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-      if (App.oidcClient.isAuthorized || currentIModelConnection.isSnapshot)
+      if (IModelApp.authorizationClient!.isAuthorized || currentIModelConnection.isSnapshot)
         await currentIModelConnection.close();
       UiFramework.setIModelConnection(undefined);
     }
