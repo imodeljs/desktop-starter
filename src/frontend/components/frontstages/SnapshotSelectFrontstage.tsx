@@ -2,21 +2,18 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import * as React from "react";
 
-import { assert } from "@bentley/bentleyjs-core";
-import { OpenDialogOptions, OpenDialogReturnValue } from "electron";
-import { getIModelElectronApi } from "@bentley/imodeljs-common";
+import { OpenDialogOptions } from "electron";
+import * as React from "react";
+import { ElectronApp } from "@bentley/electron-manager/lib/ElectronFrontend";
 import { IModelApp } from "@bentley/imodeljs-frontend";
 import { Button, ButtonSize, ButtonType, FillCentered, Headline } from "@bentley/ui-core";
 import {
-  BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef,
-  CoreTools, Frontstage, FrontstageManager, FrontstageProps, FrontstageProvider, ToolWidgetComposer,
-  Widget, Zone,
+  BackstageAppButton, ConfigurableCreateInfo, ContentControl, ContentGroup, ContentLayoutDef, CoreTools, Frontstage, FrontstageManager,
+  FrontstageProps, FrontstageProvider, ToolWidgetComposer, Widget, Zone,
 } from "@bentley/ui-framework";
-
 import { App } from "../../app/App";
-import { appIpc } from "../../../common/rpcs";
+
 /* eslint-disable react/jsx-key */
 
 class SnapshotSelectControl extends ContentControl {
@@ -64,7 +61,7 @@ export class SnapshotSelectFrontstage extends FrontstageProvider {
         contentManipulationTools={
           <Zone
             widgets={[
-              <Widget isFreeform={true} element={<ToolWidgetComposer cornerItem={<BackstageAppButton/>}/>} />,
+              <Widget isFreeform={true} element={<ToolWidgetComposer cornerItem={<BackstageAppButton />} />} />,
             ]}
           />
         }
@@ -84,9 +81,7 @@ class LocalFilePage extends React.Component {
       filters: [{ name: "iModels", extensions: ["ibim", "bim"] }],
     };
 
-    const api = getIModelElectronApi();
-    assert(api !== undefined);
-    const val = (await api.invoke(appIpc("openFile"), options)) as OpenDialogReturnValue;
+    const val = await ElectronApp.callDialog("showOpenDialog", options);
     const file = val.canceled ? undefined : val.filePaths[0];
     if (file) {
       try {
@@ -102,7 +97,7 @@ class LocalFilePage extends React.Component {
         const file: File = this._input.files[0];
         if (file) {
           try {
-            App.store.dispatch({type: "App:OPEN_SNAPSHOT", payload: file });
+            App.store.dispatch({ type: "App:OPEN_SNAPSHOT", payload: file });
           } catch (e) {
             alert(e.message);
           }

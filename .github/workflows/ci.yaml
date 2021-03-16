@@ -20,5 +20,5 @@ jobs:
           node-version: 12.x
       - run: npm ci
       - run: npm run lint
-      - run: npm run build:prod
+      - run: npm run build
       - run: npm run build:pack
