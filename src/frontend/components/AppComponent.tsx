@@ -15,7 +15,7 @@ import {
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import {
-  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext,
+  ConfigurableUiContent, FrameworkVersion, FrontstageDef, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext,
   UiFramework,
 } from "@bentley/ui-framework";
 import { App } from "../app/App";
@@ -23,6 +23,7 @@ import { SwitchState } from "../app/AppState";
 import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 import { AccessToken } from "@bentley/itwin-client";
+import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -163,6 +164,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     IModelApp.authorizationClient!.onUserStateChanged.addListener(this._onUserStateChanged, this);
+
     // Make sure user is signed in before attempting to open an iModel
     if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
@@ -195,23 +197,22 @@ export default class AppComponent extends React.Component<{}, AppState> {
     });
   }
 
-  private _onStartSignin = async () => {
+  private async _onStartSignin() {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
-    const auth = IModelApp.authorizationClient!;
+    const auth: FrontendAuthorizationClient = IModelApp.authorizationClient!;
     if (auth.isAuthorized) {
       return true;
     }
 
     return new Promise<boolean>((resolve, reject) => {
-      auth.onUserStateChanged.addOnce((token?: AccessToken) =>
-        resolve(token !== undefined));
+      auth.onUserStateChanged.addOnce((token?: AccessToken) => resolve(token !== undefined));
       auth.signIn().catch((err) => reject(err));
     });
   }
 
-  private async _onOffline() {
+  private async _onOffline(): Promise<void> {
     this._wantSnapshot = true;
-    const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
+    const frontstageDef: FrontstageDef | undefined = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
   }
@@ -238,7 +239,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   /** Handle iModel open event */
-  private _onIModelOpened = async (imodel?: IModelConnection) => {
+  private async _onIModelOpened(imodel?: IModelConnection) {
     this.setState({ isOpening: false });
     if (!imodel) {
       UiFramework.setIModelConnection(undefined);
@@ -298,7 +299,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={this._onStartSignin} onOffline={this._onOffline} />);
+      ui = (<SignIn onSignIn={() => { this._onStartSignin(); }} onOffline={() => { this._onOffline(); }} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
