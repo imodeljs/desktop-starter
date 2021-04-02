@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
+import { Config } from "@bentley/bentleyjs-core";
 import { ElectronApp } from "@bentley/electron-manager/lib/ElectronFrontend";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";

@@ -10,7 +10,7 @@ import { Provider } from "react-redux";
 import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
 import { SyncMode } from "@bentley/imodeljs-common";
 import {
-  BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
+  BriefcaseConnection, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
@@ -184,8 +184,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
       user: {
         ...prev.user,
         isAuthorized: IModelApp.authorizationClient!.isAuthorized,
-        isLoading: false
-      }
+        isLoading: false,
+      },
     }), async () => {
       if (this.state.user.isAuthorized) {
         if (this._isAutoOpen) {
@@ -195,9 +195,9 @@ export default class AppComponent extends React.Component<{}, AppState> {
         this.clearAutoOpenConfig();
       }
     });
-  }
+  };
 
-  private async _onStartSignin() {
+  private async _onStartSignin(): Promise<boolean> {
     this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
     const auth: FrontendAuthorizationClient = IModelApp.authorizationClient!;
     if (auth.isAuthorized) {
@@ -299,7 +299,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={() => { this._onStartSignin(); }} onOffline={() => { this._onOffline(); }} />);
+      ui = (<SignIn onSignIn={() => { void this._onStartSignin(); }} onOffline={() => { void this._onOffline(); }} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
