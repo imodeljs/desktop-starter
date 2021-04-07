@@ -7,6 +7,8 @@ jobs:
   create_release:
     name: Windows Release
     runs-on: windows-latest
+    env:
+      IMJS_ELECTRON_TEST_CLIENT_ID: imodeljs-electron-samples
     if: ${{ startsWith(github.event.pull_request.title, '[Bump Version] ') && github.event.pull_request.merged }}
     steps:
       - uses: actions/checkout@v2
