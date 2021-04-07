@@ -28,7 +28,8 @@
     "electron:debug": "cross-env NODE_ENV=development electron lib/backend/main.js",
     "lint": "eslint --config package.json --no-eslintrc \"./src/**/*.{ts,tsx}\" 1>&2",
     "start": "npm run build:backend && run-p \"start:frontend\" \"electron:debug\"",
-    "start:frontend": "cross-env BROWSER=none DISABLE_ESLINT=true USE_FAST_SASS=true TRANSPILE_DEPS=false react-scripts start",
+    "start:frontend": "npm run prebuild && cross-env BROWSER=none DISABLE_ESLINT=true USE_FAST_SASS=true TRANSPILE_DEPS=false react-scripts start",
+    "prebuild": "cross-env NODE_ENV=development node src/scripts/checkEnvVars.js",
     "build:pack": "electron-builder --dir",
     "build:dist": "electron-builder"
   },

@@ -71,12 +71,13 @@ export class App {
   }
 
   public static getAuthConfig(): NativeAppAuthorizationConfiguration {
-    const redirectUri = Config.App.getString("IMJS_ELECTRON_TEST_REDIRECT_URI");
-    const scope = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access";
+    const redirectUri = process.env.IMJS_ELECTRON_TEST_REDIRECT_URI;
+    const clientId = process.env.IMJS_ELECTRON_TEST_CLIENT_ID;
+    const scope: string = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access";
 
     return {
-      clientId: "imodeljs-electron-test",
-      redirectUri,
+      clientId: clientId ?? "No ClientID provided. Please create a client at developer.bentley.com and add it to .env.local",
+      redirectUri: redirectUri ?? "",
       scope,
     };
   }
