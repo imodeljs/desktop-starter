@@ -5,7 +5,6 @@
 import { ElectronApp } from "@bentley/electron-manager/lib/ElectronFrontend";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { NativeAppAuthorizationConfiguration } from "@bentley/imodeljs-common";
 import { AsyncMethodsOf, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
@@ -26,21 +25,11 @@ export class App {
   }
 
   public static async startup(): Promise<void> {
-    const clientId = process.env.IMJS_ELECTRON_TEST_CLIENT_ID;
-    const authConfig: NativeAppAuthorizationConfiguration = {
-      clientId: clientId ?? "No ClientID provided. Please create a client at developer.bentley.com and add it to .env.local",
-      redirectUri: "http://localhost:3000/signin-callback",
-      scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access",
-    };
-
     await ElectronApp.startup({
       iModelApp: {
         applicationVersion: "1.0.0",
         notifications: new AppNotificationManager(), // Use the AppNotificationManager subclass from ui-framework to get prompts and messages
         rpcInterfaces: getRpcInterfaces(),
-      },
-      nativeApp: {
-        authConfig,
       },
     });
 
