@@ -52,8 +52,8 @@ const initialize = async () => {
   Logger.setLevelDefault(LogLevel.Warning);
   Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
-  const clientId = process.env.IMJS_ELECTRON_TEST_CLIENT_ID; /**** Replace with your client id  ****/
-  assert(clientId !== undefined, `No ClientID provided.`); // Please create a new "Desktop / Mobile" client at developer.bentley.com and add the Client ID as IMJS_ELECTRON_TEST_CLIENT_ID or hardcode it to the variable above
+  const clientId = process.env.IMJS_ELECTRON_TEST_CLIENT_ID; /**** Replace with your Client ID  ****/
+  assert(clientId !== undefined, `No Client ID provided.`); // Please create a new "Desktop / Mobile" client at developer.bentley.com and assign the Client ID to the variable above
 
   const opts = {
     electronHost: {
