@@ -16,6 +16,10 @@ See <https://itwinjs.org> for comprehensive documentation on the iTwin.js API an
     npm install
     ```
 
+1. Configure client id
+    1. Create a new Desktop/Mobile client at [developer.bentley.com](https://developer.bentley.com/register)
+    1. Add the Client ID to the `initialize` method in [./src/backend/main.ts](./src/backend/main.ts#L55)
+
 1. Start the app:
 
     ```sh
