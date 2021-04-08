@@ -12,8 +12,6 @@ export interface ViewerConfig {
     iModel: string;
     name: string;
   };
-  clientId: string;
-  redirectUri: string;
 }
 
 // ipc channel name for this application

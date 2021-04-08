@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 import * as minimist from "minimist";
 import * as path from "path";
-import { Logger, LogLevel } from "@bentley/bentleyjs-core";
+import { assert, Logger, LogLevel } from "@bentley/bentleyjs-core";
 import { ElectronHost } from "@bentley/electron-manager/lib/ElectronBackend";
 import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
@@ -37,8 +37,6 @@ class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterfac
     return {
       sampleiModelPath: samplePath,
       snapshotName: parsedArgs._[0] ?? getAppEnvVar("SNAPSHOT"),
-      clientId: getAppEnvVar("CLIENT_ID") ?? appInfo.id,
-      redirectUri: getAppEnvVar("REDIRECT_URI") ?? `http://localhost:3000/signin-callback`,
       project: (name && iModel) ? { iModel, name } : undefined,
     };
   }
@@ -54,12 +52,20 @@ const initialize = async () => {
   Logger.setLevelDefault(LogLevel.Warning);
   Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
+  const clientId = process.env.IMJS_ELECTRON_TEST_CLIENT_ID;
+  assert(clientId !== undefined); // No ClientID provided. Please create a client at developer.bentley.com and add it to .env.local
+
   const opts = {
     electronHost: {
       webResourcesPath: path.join(__dirname, "..", "..", "build"),
       rpcInterfaces: getRpcInterfaces(),
       ipcHandlers: [DesktopStarterHandler],
       developmentServer: process.env.NODE_ENV === "development",
+      authConfig: {
+        clientId,
+        scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access",
+      },
+
     },
   };
 
