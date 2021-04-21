@@ -10,7 +10,7 @@ See <https://itwinjs.org> for comprehensive documentation on the iTwin.js API an
 
 ## Tutorial
 
-[To build and run this application, just follow our step-by-step tutorial.](https://www.itwinjs.org/learning/tutorials/develop-desktop-viewer/)
+To build and run this application, just follow our [step-by-step tutorial.](https://www.itwinjs.org/learning/tutorials/develop-desktop-viewer/)
 
 ## Contributing
 
