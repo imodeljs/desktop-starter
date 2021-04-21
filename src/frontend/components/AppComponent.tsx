@@ -24,6 +24,7 @@ import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 import { AccessToken } from "@bentley/itwin-client";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
+import { BriefcaseManager } from "@bentley/imodeljs-backend";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -380,7 +381,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._snapshotName = null;
 
     try {
-      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
+      const briefcase: BriefcaseConnection = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: false });
+
+      await briefcase.pullAndMergeChanges();
+
       await this._onIModelOpened(briefcase);
     } catch (error) {
       // eslint-disable-next-line no-console
