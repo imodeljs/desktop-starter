@@ -7,8 +7,9 @@ import * as React from "react";
 import {
   BasicNavigationWidget, BasicToolWidget, ContentGroup, ContentLayoutDef, ContentViewManager,
   CoreTools, CustomItemDef, Frontstage, FrontstageProvider, IModelViewportControl, SyncUiEventId,
-  ToolbarHelper, UiFramework, ViewSelector, Widget, WidgetState, Zone, ZoneState,
+  ToolbarHelper, UiFramework, ViewSelector, Widget, Zone, ZoneState,
 } from "@bentley/ui-framework";
+import { WidgetState } from "@bentley/ui-abstract";
 
 import { PropertyGridWidget } from "../widgets/PropertyGridWidget";
 import { AppStatusBarWidget } from "../widgets/statusbar/AppStatusBar";

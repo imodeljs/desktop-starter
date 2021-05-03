@@ -24,7 +24,6 @@ import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
 import { AccessToken } from "@bentley/itwin-client";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
-import { BriefcaseManager } from "@bentley/imodeljs-backend";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
