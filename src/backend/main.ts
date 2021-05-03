@@ -63,9 +63,8 @@ const initialize = async () => {
       developmentServer: process.env.NODE_ENV === "development",
       authConfig: {
         clientId,
-        scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access",
+        scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party",
       },
-
     },
   };
 
