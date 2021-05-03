@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      IMJS_ELECTRON_TEST_CLIENT_ID: imodeljs-electron-samples
+      IMJS_ELECTRON_CLIENT_ID: imodeljs-electron-samples
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 12.x
