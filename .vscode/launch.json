@@ -14,38 +14,46 @@
   ],
   "configurations": [
     {
-      "name": "Main",
-      "presentation": {
-        "hidden": true
-      },
+      "name": "Electron: Main",
       "type": "pwa-node",
       "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "outputCapture": "std",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
-        "${workspaceFolder}/lib/backend/main.js",
+        "lib/backend/main.js",
+        "C:\\Users\\will.bentley\\OneDrive - Bentley Systems, Inc\\Documents\\iModel Academy Docs\\Sample_iModels\\snapshots\\BridgeOn.bim",
         "--remote-debugging-port=9223"
       ],
       "env": {
         "NODE_ENV": "development"
       },
-      "autoAttachChildProcesses": false,
-      "attachSimplePort": 0,
-      "outputCapture": "std",
-      "cascadeTerminateToConfigurations": [
-        "Renderer"
-      ]
+      "presentation": {
+        "group": "desktop-starter"
+      },
     },
     {
-      "name": "Renderer",
-      "presentation": {
-        "hidden": true
-      },
+      "name": "Electron: Renderer",
       "type": "pwa-chrome",
       "request": "attach",
       "port": 9223,
-      "webRoot": "${workspaceFolder}/build/",
-      "cascadeTerminateToConfigurations": [
-        "Main"
+      "timeout": 30000,
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js",
+        "!**/node_modules/**"
+      ],
+      "presentation": {
+        "group": "desktop-starter"
+      },
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Electron: All",
+      "configurations": [
+        "Electron: Main",
+        "Electron: Renderer"
       ]
     }
   ]
