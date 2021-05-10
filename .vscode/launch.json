@@ -1,36 +1,47 @@
 {
   "version": "0.2.0",
   "configurations": [
-      {
-          "type": "node",
-          "request": "launch",
-          "name": "Electron: Main",
-          "protocol": "inspector",
-          "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-          "runtimeArgs": [
-              "--remote-debugging-port=9223",
-              "."
-          ],
-          "windows": {
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-          }
-      },
-      {
-          "name": "Electron: Renderer",
-          "type": "chrome",
-          "request": "attach",
-          "port": 9223,
-          "webRoot": "${workspaceFolder}/build",
-          "timeout": 30000
-        }
+    {
+      "name": "Electron: Main",
+      "type": "pwa-node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "outputCapture": "std",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [
+        "lib/backend/main.js",
+        "--remote-debugging-port=9223"
       ],
-      "compounds": [
-        {
-          "name": "Electron: All",
-          "configurations": [
-            "Electron: Main",
-            "Electron: Renderer"
-          ]
-      }
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "presentation": {
+        "group": "desktop-starter"
+      },
+    },
+    {
+      "name": "Electron: Renderer",
+      "type": "pwa-chrome",
+      "request": "attach",
+      "port": 9223,
+      "timeout": 30000,
+      "outFiles": [
+        "${workspaceFolder}/build/**/*.js",
+        "!**/node_modules/**"
+      ],
+      "presentation": {
+        "group": "desktop-starter"
+      },
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Electron: All",
+      "configurations": [
+        "Electron: Main",
+        "Electron: Renderer"
+      ]
+    }
   ]
 }

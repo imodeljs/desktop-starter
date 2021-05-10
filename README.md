@@ -12,6 +12,11 @@ See <https://itwinjs.org> for comprehensive documentation on the iTwin.js API an
 
 To build and run this application, just follow our [step-by-step tutorial.](https://www.itwinjs.org/learning/tutorials/develop-desktop-viewer/)
 
+## Debugging
+
+1. In VS Code, select Terminal -> Run Task..., and pick "Watch All"
+1. Launch the VS Code debugger with configuration "Electron: All"
+
 ## Contributing
 
 [Contributing to iTwin.js](https://github.com/imodeljs/imodeljs/blob/master/CONTRIBUTING.md)
