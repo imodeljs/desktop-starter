@@ -35,6 +35,8 @@ export class App {
 
     this.config = await this.callMyBackend("getConfig");
 
+    console.log(this.config);
+
     // initialize Presentation
     await Presentation.initialize({ activeLocale: IModelApp.i18n.languageList()[0] });
 
