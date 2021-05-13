@@ -3,15 +3,6 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-  "compounds": [
-    {
-      "name": "Electron",
-      "configurations": [
-        "Main",
-        "Renderer"
-      ]
-    }
-  ],
   "configurations": [
     {
       "name": "Electron: Main",
@@ -23,7 +14,6 @@
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
         "lib/backend/main.js",
-        "C:\\Users\\will.bentley\\OneDrive - Bentley Systems, Inc\\Documents\\iModel Academy Docs\\Sample_iModels\\snapshots\\BridgeOn.bim",
         "--remote-debugging-port=9223"
       ],
       "env": {
@@ -39,10 +29,6 @@
       "request": "attach",
       "port": 9223,
       "timeout": 30000,
-      "outFiles": [
-        "${workspaceFolder}/build/**/*.js",
-        "!**/node_modules/**"
-      ],
       "presentation": {
         "group": "desktop-starter"
       },

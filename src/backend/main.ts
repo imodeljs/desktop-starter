@@ -27,8 +27,6 @@ class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterfac
       ? minimist(process.argv.slice(1 + process.argv.findIndex((a: string) => a.includes("main.js"))))
       : minimist(process.argv.slice(1));
 
-    console.log(parsedArgs);
-
     const samplePath = ElectronHost.app.isPackaged
       ? path.join(ElectronHost.app.getAppPath(), "build", "assets").replace("app.asar", "app.asar.unpacked")
       : path.join("assets", "Baytown.bim");
@@ -54,7 +52,7 @@ const initialize = async () => {
   Logger.setLevelDefault(LogLevel.Warning);
   Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
-  const clientId = "native-DRZiQjj8SP84r9RtcFQ0YstEz"; // **** Replace with your Client ID  ****
+  const clientId = process.env.IMJS_ELECTRON_CLIENT_ID; // **** Replace with your Client ID  ****
   assert(clientId !== undefined, `No Client ID provided.`); // Please create a new "Desktop / Mobile" client at developer.bentley.com and assign the Client ID to the variable above
 
   const opts = {

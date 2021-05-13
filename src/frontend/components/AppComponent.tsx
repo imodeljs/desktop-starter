@@ -68,7 +68,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
       isOpening: false,
     };
 
-    this._autoOpenConfig = { snapshotName: null, contextId: null, imodelId: null };
+    this._autoOpenConfig = { snapshotName: App.config.snapshotName ?? null, contextId: null, imodelId: null };
     this._isAutoOpen = true;
     this._wantSnapshot = true;
 
