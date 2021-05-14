@@ -19,6 +19,7 @@
   "scripts": {
     "build": "run-p build:backend build:frontend copy",
     "build:backend": "tsc -p tsconfig.backend.json",
+    "watch:backend": "tsc -p tsconfig.backend.json --watch",
     "build:frontend": "cross-env DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
     "clean": "rimraf lib build dist",
     "copy": "npm run copy:assets && npm run copy:enUS",
@@ -27,8 +28,8 @@
     "electron": "electron lib/backend/main.js",
     "electron:debug": "cross-env NODE_ENV=development electron lib/backend/main.js",
     "lint": "eslint --config package.json --no-eslintrc \"./src/**/*.{ts,tsx}\" 1>&2",
-    "start": "npm run build:backend && run-p \"start:frontend\" \"electron\"",
-    "start:frontend": "cross-env BROWSER=none DISABLE_ESLINT=true USE_FAST_SASS=true TRANSPILE_DEPS=false react-scripts start",
+    "start": "npm run build:backend && run-p \"start:frontend\" \"electron:debug\"",
+    "start:frontend": "cross-env USE_FULL_SOURCEMAPS=true USE_FAST_SASS=true BROWSER=none react-scripts start",
     "build:pack": "electron-builder --dir",
     "build:dist": "electron-builder"
   },

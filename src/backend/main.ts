@@ -22,9 +22,9 @@ const getAppEnvVar = (varName: string): string | undefined => process.env[`${app
 class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterface {
   public get channelName() { return desktopStarterChannel; }
   public async getConfig(): Promise<ViewerConfig> {
-    // first two arguments are .exe name and the path to ViewerMain.js. Skip them.
+    // first two arguments are .exe name and the path to main.js. Skip them.
     const parsedArgs = process.env.NODE_ENV === "development"
-      ? minimist(process.argv.slice(2 + process.argv.findIndex((a: string) => a.includes("main.js"))))
+      ? minimist(process.argv.slice(1 + process.argv.findIndex((a: string) => a.includes("main.js"))))
       : minimist(process.argv.slice(1));
 
     const samplePath = ElectronHost.app.isPackaged
