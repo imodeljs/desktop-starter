@@ -26,10 +26,6 @@
       "request": "attach",
       "port": 9223,
       "timeout": 30000,
-      "outFiles": [
-        "${workspaceFolder}/build/**/*.js",
-        "!**/node_modules/**"
-      ],
       "presentation": {
         "group": "desktop-starter"
       },
