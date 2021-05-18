@@ -65,7 +65,6 @@ const initialize = async () => {
         clientId,
         scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access",
       },
-
     },
   };
 

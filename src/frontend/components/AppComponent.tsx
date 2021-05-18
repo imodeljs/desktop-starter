@@ -380,7 +380,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._snapshotName = null;
 
     try {
-      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
+      const briefcase: BriefcaseConnection = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: false });
+
+      await briefcase.pullAndMergeChanges();
+
       await this._onIModelOpened(briefcase);
     } catch (error) {
       // eslint-disable-next-line no-console
