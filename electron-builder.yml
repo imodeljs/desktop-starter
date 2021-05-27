@@ -3,13 +3,12 @@ productName: Desktop Starter
 extends: react-cra
 files:
 - build/**/*
-- lib/**/*
 - node_modules/**/*
 - "!**/*.map"
 - "!**/*.d.ts"
 - "!**/*.tsbuildinfo"
 extraMetadata:
-  main: lib/backend/main.js
+  main: build/app/main.js
 asarUnpack:
 - build/assets/**/*
 mac:

@@ -25,6 +25,7 @@
     "build",
     "lib",
     "node_modules",
-    "./src/backend/**/*.ts"
+    "./src/backend/**/*.ts",
+    "scripts"
   ]
 }
