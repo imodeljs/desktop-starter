@@ -21,11 +21,9 @@ jobs:
         name: git config
       - run: npm ci
       - run: npx run-s lint build build:backend:webpack
-      - uses: actions/github-script@v2
+      - run: ((Get-Content -path ./build/app/main.js -Raw) -replace 'REPLACE_WITH_CLIENT_ID', ${env:IMJS_ELECTRON_CLIENT_ID}) | Set-Content -Path ./build/app/main.js
+        shell: powershell
         name: set client id
-        with:
-          script: |
-            ((Get-Content -path ./build/app/main.js -Raw) -replace 'REPLACE_WITH_CLIENT_ID', ${IMJS_ELECTRON_CLIENT_ID}) | Set-Content -Path ./build/app/main.js
       - run: npm run build:dist
       - uses: actions/github-script@v2
         name: create release
