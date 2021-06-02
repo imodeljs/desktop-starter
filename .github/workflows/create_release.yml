@@ -20,7 +20,13 @@ jobs:
           git config --global user.name "imodeljs-admin[bot]"
         name: git config
       - run: npm ci
-      - run: npx run-s lint build build:backend:webpack build:dist
+      - run: npx run-s lint build build:backend:webpack
+      - uses: actions/github-script@v2
+        name: set client id
+        with:
+          script: |
+            ((Get-Content -path ./build/app/main.js -Raw) -replace 'REPLACE_WITH_CLIENT_ID', ${IMJS_ELECTRON_CLIENT_ID}) | Set-Content -Path ./build/app/main.js
+      - run: npm run build:dist
       - uses: actions/github-script@v2
         name: create release
         with:
