@@ -20,6 +20,7 @@
     "build": "run-p build:backend build:frontend copy",
     "build:backend": "tsc -p tsconfig.backend.json",
     "watch:backend": "tsc -p tsconfig.backend.json --watch",
+    "build:backend:webpack": "backend-webpack-tools build -s ./lib/backend/main.js -o ./build/app/",
     "build:frontend": "cross-env DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
     "clean": "rimraf lib build dist",
     "copy": "npm run copy:assets && npm run copy:enUS",
@@ -77,6 +78,7 @@
     "redux": "^4.0.0"
   },
   "devDependencies": {
+    "@bentley/backend-webpack-tools": "2.15.0",
     "@bentley/build-tools": "2.15.0",
     "@bentley/eslint-plugin": "2.15.0",
     "@bentley/react-scripts": "3.4.9",
