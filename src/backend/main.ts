@@ -4,7 +4,7 @@
 *--------------------------------------------------------------------------------------------*/
 import * as minimist from "minimist";
 import * as path from "path";
-import { assert, Logger, LogLevel } from "@bentley/bentleyjs-core";
+import { Logger, LogLevel } from "@bentley/bentleyjs-core";
 import { ElectronHost } from "@bentley/electron-manager/lib/ElectronBackend";
 import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
@@ -42,6 +42,10 @@ class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterfac
   }
 }
 
+const getClientId = () => {
+  return "REPLACE_WITH_CLIENT_ID";
+};
+
 /**
  * Initializes Electron backend
  */
@@ -52,8 +56,13 @@ const initialize = async () => {
   Logger.setLevelDefault(LogLevel.Warning);
   Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
-  const clientId = "REPLACE_WITH_CLIENT_ID"; // **** Replace with your Client ID  ****
-  assert(clientId !== "REPLACE_WITH_CLIENT_ID", `No Client ID provided.`); // Please create a new "Desktop / Mobile" client at developer.bentley.com and assign the Client ID to the variable above
+  // The purpose of getClientId() is to ensure the user sets the clientId.
+  // In production ready code, the clientId const should be hard coded and the check should be removed.
+  const clientId = getClientId();
+  if (clientId === "REPLACE_WITH_CLIENT_ID") {
+    Logger.logError(AppLoggerCategory.Backend, `No Client ID provided. Please create a new "Desktop / Mobile" client at developer.bentley.com and assign the Client ID to the variable above`);
+    process.exit(1);
+  }
 
   const opts = {
     electronHost: {
