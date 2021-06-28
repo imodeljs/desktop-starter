@@ -22,9 +22,9 @@ const getAppEnvVar = (varName: string): string | undefined => process.env[`${app
 class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterface {
   public get channelName() { return desktopStarterChannel; }
   public async getConfig(): Promise<ViewerConfig> {
-    // first two arguments are .exe name and the path to ViewerMain.js. Skip them.
+    // first two arguments are .exe name and the path to main.js. Skip them.
     const parsedArgs = process.env.NODE_ENV === "development"
-      ? minimist(process.argv.slice(2 + process.argv.findIndex((a: string) => a.includes("main.js"))))
+      ? minimist(process.argv.slice(1 + process.argv.findIndex((a: string) => a.includes("main.js"))))
       : minimist(process.argv.slice(1));
 
     const samplePath = ElectronHost.app.isPackaged
@@ -37,12 +37,14 @@ class DesktopStarterHandler extends IpcHandler implements DesktopStarterInterfac
     return {
       sampleiModelPath: samplePath,
       snapshotName: parsedArgs._[0] ?? getAppEnvVar("SNAPSHOT"),
-      clientId: getAppEnvVar("CLIENT_ID") ?? appInfo.id,
-      redirectUri: getAppEnvVar("REDIRECT_URI") ?? `http://localhost:3000/signin-callback`,
       project: (name && iModel) ? { iModel, name } : undefined,
     };
   }
 }
+
+const getClientId = () => {
+  return "REPLACE_WITH_CLIENT_ID";
+};
 
 /**
  * Initializes Electron backend
@@ -54,12 +56,24 @@ const initialize = async () => {
   Logger.setLevelDefault(LogLevel.Warning);
   Logger.setLevel(AppLoggerCategory.Backend, LogLevel.Info);
 
+  // The purpose of getClientId() is to ensure the user sets the clientId.
+  // In production ready code, the clientId const should be hard coded and the check should be removed.
+  const clientId = getClientId();
+  if (clientId === "REPLACE_WITH_CLIENT_ID") {
+    Logger.logError(AppLoggerCategory.Backend, `No Client ID provided. Please create a new "Desktop / Mobile" client at developer.bentley.com and assign the Client ID to the variable above`);
+    process.exit(1);
+  }
+
   const opts = {
     electronHost: {
       webResourcesPath: path.join(__dirname, "..", "..", "build"),
       rpcInterfaces: getRpcInterfaces(),
       ipcHandlers: [DesktopStarterHandler],
       developmentServer: process.env.NODE_ENV === "development",
+      authConfig: {
+        clientId,
+        scope: "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access",
+      },
     },
   };
 

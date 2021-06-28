@@ -8,27 +8,14 @@ See <https://itwinjs.org> for comprehensive documentation on the iTwin.js API an
 
 ![App Screenshot](./docs/header.png)
 
-## Development setup
+## Tutorial
 
-1. Install the dependencies:
+To build and run this application, just follow our [step-by-step tutorial.](https://www.itwinjs.org/learning/tutorials/develop-desktop-viewer/)
 
-    ```sh
-    npm install
-    ```
+## Debugging
 
-1. Start the app:
-
-    ```sh
-    npm start
-    ```
-
-## Advanced configuration options
-
-If an iModel is needed for testing, follow the developer registration procedure [here](https://itwinjs.org/learning/tutorials/create-test-imodel-offline/)
-
-### Client registration
-
-These variables must be updated before deployment, but the supplied defaults can be used for testing on localhost. Create a client registration using the procedure [here](https://itwinjs.org/learning/tutorials/registering-applications/). For the purpose of running this app on localhost, ensure your registration includes <http://localhost:3000/signin-oidc> as a valid redirect URI.
+1. In VS Code, select Terminal -> Run Task..., and pick "Watch All"
+1. Launch the VS Code debugger with configuration "Electron: All"
 
 ## Contributing
 

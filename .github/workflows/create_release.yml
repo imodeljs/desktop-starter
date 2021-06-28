@@ -7,6 +7,8 @@ jobs:
   create_release:
     name: Windows Release
     runs-on: windows-latest
+    env:
+      IMJS_ELECTRON_CLIENT_ID: imodeljs-electron-samples
     if: ${{ startsWith(github.event.pull_request.title, '[Bump Version] ') && github.event.pull_request.merged }}
     steps:
       - uses: actions/checkout@v2
@@ -18,7 +20,11 @@ jobs:
           git config --global user.name "imodeljs-admin[bot]"
         name: git config
       - run: npm ci
-      - run: npx run-s lint build build:dist
+      - run: npx run-s lint build build:backend:webpack
+      - run: ((Get-Content -path ./build/app/main.js -Raw) -replace 'REPLACE_WITH_CLIENT_ID', ${env:IMJS_ELECTRON_CLIENT_ID}) | Set-Content -Path ./build/app/main.js
+        shell: powershell
+        name: set client id
+      - run: npm run build:dist
       - uses: actions/github-script@v2
         name: create release
         with:

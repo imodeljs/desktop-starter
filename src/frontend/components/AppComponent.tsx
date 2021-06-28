@@ -10,18 +10,20 @@ import { Provider } from "react-redux";
 import { Config, GuidString, Id64 } from "@bentley/bentleyjs-core";
 import { SyncMode } from "@bentley/imodeljs-common";
 import {
-  BriefcaseConnection, FrontendRequestContext, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
+  BriefcaseConnection, IModelApp, IModelConnection, MessageBoxIconType, MessageBoxType, NativeApp, ViewState,
 } from "@bentley/imodeljs-frontend";
 import { SignIn } from "@bentley/ui-components";
 import { Dialog, LoadingSpinner, SpinnerSize } from "@bentley/ui-core";
 import {
-  ConfigurableUiContent, FrameworkVersion, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext,
+  ConfigurableUiContent, FrameworkVersion, FrontstageDef, FrontstageManager, FrontstageProvider, SyncUiEventDispatcher, ThemeManager, ToolbarDragInteractionContext,
   UiFramework,
 } from "@bentley/ui-framework";
 import { App } from "../app/App";
 import { SwitchState } from "../app/AppState";
 import { MainFrontstage } from "../components/frontstages/MainFrontstage";
 import { AppBackstageComposer } from "./backstage/AppBackstageComposer";
+import { AccessToken } from "@bentley/itwin-client";
+import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 
 export interface AutoOpenConfig {
   snapshotName: string | null;
@@ -60,13 +62,13 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
     this.state = {
       user: {
-        isAuthorized: App.oidcClient.isAuthorized,
+        isAuthorized: IModelApp.authorizationClient!.isAuthorized,
         isLoading: false,
       },
       isOpening: false,
     };
 
-    this._autoOpenConfig = { snapshotName: null, contextId: null, imodelId: null };
+    this._autoOpenConfig = { snapshotName: App.config.snapshotName ?? null, contextId: null, imodelId: null };
     this._isAutoOpen = true;
     this._wantSnapshot = true;
 
@@ -161,7 +163,8 @@ export default class AppComponent extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    App.oidcClient.onUserStateChanged.addListener(this._onUserStateChanged, this);
+    IModelApp.authorizationClient!.onUserStateChanged.addListener(this._onUserStateChanged, this);
+
     // Make sure user is signed in before attempting to open an iModel
     if (!this._wantSnapshot && !this.state.user.isAuthorized)
       this.setState((prev) => ({ user: { ...prev.user, isLoading: false } }));
@@ -173,27 +176,43 @@ export default class AppComponent extends React.Component<{}, AppState> {
 
   public componentWillUnmount() {
     this._subscription.unsubscribe();
-    App.oidcClient.onUserStateChanged.removeListener(this._onUserStateChanged);
+    IModelApp.authorizationClient!.onUserStateChanged.removeListener(this._onUserStateChanged);
   }
 
-  private async _onUserStateChanged() {
-    this.setState((prev) => ({ user: { ...prev.user, isAuthorized: App.oidcClient.isAuthorized, isLoading: false } }), async () => {
+  private _onUserStateChanged = () => {
+    this.setState((prev) => ({
+      user: {
+        ...prev.user,
+        isAuthorized: IModelApp.authorizationClient!.isAuthorized,
+        isLoading: false,
+      },
+    }), async () => {
       if (this.state.user.isAuthorized) {
-        if (this._isAutoOpen)
+        if (this._isAutoOpen) {
           await this._handleOpen();
-      } else
+        }
+      } else {
         this.clearAutoOpenConfig();
+      }
+    });
+  };
+
+  private async _onStartSignin(): Promise<boolean> {
+    this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
+    const auth: FrontendAuthorizationClient = IModelApp.authorizationClient!;
+    if (auth.isAuthorized) {
+      return true;
+    }
+
+    return new Promise<boolean>((resolve, reject) => {
+      auth.onUserStateChanged.addOnce((token?: AccessToken) => resolve(token !== undefined));
+      auth.signIn().catch((err) => reject(err));
     });
   }
 
-  private async _onStartSignin() {
-    this.setState((prev) => ({ user: { ...prev.user, isLoading: true } }));
-    await App.oidcClient.signIn(new FrontendRequestContext());
-  }
-
-  private async _onOffline() {
+  private async _onOffline(): Promise<void> {
     this._wantSnapshot = true;
-    const frontstageDef = FrontstageManager.findFrontstageDef("SnapshotSelector");
+    const frontstageDef: FrontstageDef | undefined = FrontstageManager.findFrontstageDef("SnapshotSelector");
     await FrontstageManager.setActiveFrontstageDef(frontstageDef);
     this.setState({});
   }
@@ -280,7 +299,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     let ui: React.ReactNode;
 
     if (!this._wantSnapshot && !this.state.user.isAuthorized) {
-      ui = (<SignIn onSignIn={async () => this._onStartSignin} onOffline={async () => this._onOffline} />); // note: must capture "this"
+      ui = (<SignIn onSignIn={() => { void this._onStartSignin(); }} onOffline={() => { void this._onOffline(); }} />);
     } else {
       // if we do have an imodel and view definition id - render imodel components
       ui = <IModelComponents />;
@@ -302,7 +321,7 @@ export default class AppComponent extends React.Component<{}, AppState> {
     const currentIModelConnection = UiFramework.getIModelConnection();
     if (currentIModelConnection) {
       SyncUiEventDispatcher.clearConnectionEvents(currentIModelConnection);
-      if (App.oidcClient.isAuthorized || currentIModelConnection.isSnapshot)
+      if (IModelApp.authorizationClient!.isAuthorized || currentIModelConnection.isSnapshot)
         await currentIModelConnection.close();
       UiFramework.setIModelConnection(undefined);
     }
@@ -361,7 +380,10 @@ export default class AppComponent extends React.Component<{}, AppState> {
     this._snapshotName = null;
 
     try {
-      const briefcase = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: true });
+      const briefcase: BriefcaseConnection = await BriefcaseConnection.openFile({ fileName: await this.getPullOnlyBriefcase(), readonly: false });
+
+      await briefcase.pullAndMergeChanges();
+
       await this._onIModelOpened(briefcase);
     } catch (error) {
       // eslint-disable-next-line no-console

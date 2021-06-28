@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IMJS_ELECTRON_CLIENT_ID: imodeljs-electron-samples
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 12.x
@@ -21,4 +23,5 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      - run: npm run build:backend:webpack
       - run: npm run build:pack

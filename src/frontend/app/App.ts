@@ -2,12 +2,10 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { ClientRequestContext, Config } from "@bentley/bentleyjs-core";
 import { ElectronApp } from "@bentley/electron-manager/lib/ElectronFrontend";
 import { FrontendAuthorizationClient } from "@bentley/frontend-authorization-client";
 import { IModelSelect } from "@bentley/imodel-select-react";
-import { DesktopAuthorizationClientConfiguration } from "@bentley/imodeljs-common";
-import { AsyncMethodsOf, DesktopAuthorizationClient, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
+import { AsyncMethodsOf, IModelApp, IpcApp, PromiseReturnType } from "@bentley/imodeljs-frontend";
 import { Presentation } from "@bentley/presentation-frontend";
 import { AppNotificationManager, ColorTheme, ConfigurableUiManager, FrontstageManager, UiFramework } from "@bentley/ui-framework";
 import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../../common/ViewerProps";
@@ -27,7 +25,6 @@ export class App {
   }
 
   public static async startup(): Promise<void> {
-
     await ElectronApp.startup({
       iModelApp: {
         applicationVersion: "1.0.0",
@@ -37,9 +34,6 @@ export class App {
     });
 
     this.config = await this.callMyBackend("getConfig");
-
-    // initialize OIDC
-    await App.initializeOidc();
 
     // initialize Presentation
     await Presentation.initialize({ activeLocale: IModelApp.i18n.languageList()[0] });
@@ -67,15 +61,5 @@ export class App {
 
     // Create a FrontStage where we can select a snapshot.
     FrontstageManager.addFrontstageProvider(new SnapshotSelectFrontstage());
-  }
-
-  public static async initializeOidc() {
-    const scope = "openid email profile organization imodelhub context-registry-service:read-only product-settings-service urlps-third-party offline_access";
-    const clientId = Config.App.getString("IMJS_ELECTRON_TEST_CLIENT_ID");
-    const redirectUri = Config.App.getString("IMJS_ELECTRON_TEST_REDIRECT_URI");
-    const oidcConfiguration: DesktopAuthorizationClientConfiguration = { clientId, redirectUri, scope };
-    const desktopClient = new DesktopAuthorizationClient(oidcConfiguration);
-    await desktopClient.initialize(new ClientRequestContext());
-    IModelApp.authorizationClient = desktopClient;
   }
 }
