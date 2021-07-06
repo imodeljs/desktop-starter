@@ -18,7 +18,7 @@
   "private": true,
   "scripts": {
     "build": "run-p build:backend build:frontend copy",
-    "build:backend": "tsc -p tsconfig.backend.json",
+    "build:backend": "tsc -p tsconfig.backend.json && npm run build:backend:webpack",
     "watch:backend": "tsc -p tsconfig.backend.json --watch",
     "build:backend:webpack": "backend-webpack-tools build -s ./lib/backend/main.js -o ./build/app/",
     "build:frontend": "cross-env DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
@@ -91,7 +91,7 @@
     "@typescript-eslint/eslint-plugin": "4.11.1",
     "cpx": "^1.5.0",
     "cross-env": "^5.1.4",
-    "electron": "^8.3.4",
+    "electron": "^13.1.4",
     "electron-builder": "22.10.5",
     "electron-devtools-installer": "^2.2.3",
     "eslint": "^7.11.0",
