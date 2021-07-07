@@ -18,10 +18,10 @@
   "private": true,
   "scripts": {
     "build": "run-p build:backend build:frontend copy",
-    "build:backend": "tsc -p tsconfig.backend.json && npm run build:backend:webpack",
+    "build:backend": "tsc -p tsconfig.backend.json",
     "watch:backend": "tsc -p tsconfig.backend.json --watch",
     "build:backend:webpack": "backend-webpack-tools build -s ./lib/backend/main.js -o ./build/app/",
-    "build:frontend": "cross-env DISABLE_NEW_JSX_TRANSFORM=true DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
+    "build:frontend": "cross-env DISABLE_NEW_JSX_TRANSFORM=true SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
     "clean": "rimraf lib build dist",
     "copy": "npm run copy:assets && npm run copy:enUS",
     "copy:assets": "cpx \"./assets/*\" ./build/assets/",
@@ -30,7 +30,7 @@
     "electron:debug": "cross-env NODE_ENV=development electron lib/backend/main.js",
     "lint": "eslint --config package.json --no-eslintrc \"./src/**/*.{ts,tsx}\" 1>&2",
     "start": "npm run build:backend && run-p \"start:frontend\" \"electron:debug\"",
-    "start:frontend": "cross-env DISABLE_NEW_JSX_TRANSFORM=true USE_FULL_SOURCEMAPS=true USE_FAST_SASS=true BROWSER=none react-scripts start",
+    "start:frontend": "cross-env DISABLE_NEW_JSX_TRANSFORM=true SKIP_PREFLIGHT_CHECK=true USE_FULL_SOURCEMAPS=true USE_FAST_SASS=true BROWSER=none react-scripts start",
     "build:pack": "electron-builder --dir",
     "build:dist": "electron-builder"
   },
