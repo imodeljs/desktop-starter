@@ -18,7 +18,7 @@
   "private": true,
   "scripts": {
     "build": "run-p build:backend build:frontend copy",
-    "build:backend": "tsc -p tsconfig.backend.json",
+    "build:backend": "tsc -p tsconfig.backend.json && npm run build:backend:webpack",
     "watch:backend": "tsc -p tsconfig.backend.json --watch",
     "build:backend:webpack": "backend-webpack-tools build -s ./lib/backend/main.js -o ./build/app/",
     "build:frontend": "cross-env DISABLE_NEW_JSX_TRANSFORM=true SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT=true GENERATE_SOURCEMAP=false USE_FAST_SASS=true TRANSPILE_DEPS=false DISABLE_TERSER=true react-scripts build",
