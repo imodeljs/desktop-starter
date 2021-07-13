@@ -17,7 +17,7 @@
   "version": "1.0.7",
   "private": true,
   "scripts": {
-    "build": "run-p build:backend build:frontend copy",
+    "build": "run-p build:backend build:frontend && npm run copy",
     "build:backend": "tsc -p tsconfig.backend.json && npm run build:backend:webpack",
     "watch:backend": "tsc -p tsconfig.backend.json --watch",
     "build:backend:webpack": "backend-webpack-tools build -s ./lib/backend/main.js -o ./build/app/",
