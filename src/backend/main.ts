@@ -10,6 +10,7 @@ import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
 import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../common/ViewerProps";
 import { IpcHandler } from "@bentley/imodeljs-backend";
+import { PRESENTATION_BACKEND_ASSETS_ROOT, PRESENTATION_COMMON_ASSETS_ROOT } from "@bentley/presentation-backend/lib/presentation-backend/Constants";
 
 const appInfo = {
   id: "app",
@@ -80,7 +81,16 @@ const initialize = async () => {
   await ElectronHost.startup(opts);
 
   // Initialize Presentation
-  Presentation.initialize();
+  Presentation.initialize({
+    presentationAssetsRoot: {
+      backend: ElectronHost.app.isPackaged
+        ? path.join(PRESENTATION_BACKEND_ASSETS_ROOT).replace("app.asar", "app.asar.unpacked")
+        : PRESENTATION_BACKEND_ASSETS_ROOT,
+      common: ElectronHost.app.isPackaged
+        ? path.join(PRESENTATION_COMMON_ASSETS_ROOT).replace("app.asar", "app.asar.unpacked")
+        : PRESENTATION_COMMON_ASSETS_ROOT,
+    },
+  });
 
   await ElectronHost.openMainWindow({ width: 1280, height: 800, show: true });
 

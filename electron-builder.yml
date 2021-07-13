@@ -2,15 +2,16 @@ appId: Bentley.DesktopStarter
 productName: Desktop Starter
 extends: react-cra
 files:
-- build/**/*
-- node_modules/**/*
-- "!**/*.map"
-- "!**/*.d.ts"
-- "!**/*.tsbuildinfo"
+  - build/**/*
+  - node_modules/**/*
+  - "!**/*.map"
+  - "!**/*.d.ts"
+  - "!**/*.tsbuildinfo"
 extraMetadata:
   main: build/app/main.js
 asarUnpack:
-- build/assets/**/*
+  - build/assets/**/*
+  - build/app/**/*
 mac:
   category: public.app-category.developer-tools
 win:
