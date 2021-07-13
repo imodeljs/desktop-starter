@@ -10,7 +10,7 @@ import { Presentation } from "@bentley/presentation-backend";
 import { AppLoggerCategory } from "../common/LoggerCategory";
 import { desktopStarterChannel, DesktopStarterInterface, getRpcInterfaces, ViewerConfig } from "../common/ViewerProps";
 import { IpcHandler } from "@bentley/imodeljs-backend";
-import { PRESENTATION_COMMON_ASSETS_ROOT, PRESENTATION_BACKEND_ASSETS_ROOT  } from "@bentley/presentation-backend/lib/presentation-backend/Constants";
+import { PRESENTATION_BACKEND_ASSETS_ROOT, PRESENTATION_COMMON_ASSETS_ROOT } from "@bentley/presentation-backend/lib/presentation-backend/Constants";
 
 const appInfo = {
   id: "app",
