@@ -1,6 +1,9 @@
 # Desktop Starter
-
 Copyright © Bentley Systems, Incorporated. All rights reserved. See [LICENSE.md](./LICENSE.md) for license terms and full copyright notice.
+
+## **This repo has been archived**
+To learn how to develop iTwin.js desktop applications, please see our tutorial on [Developing a Desktop Viewer](https://www.itwinjs.org/learning/tutorials/develop-desktop-viewer/).
+___
 
 The purpose of this repository is to serve as starting point for developers wishing to create an iTwin.js Electron app.
 
